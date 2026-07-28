@@ -1,0 +1,7 @@
+python-telegram-bot==21.4
+pyautogui==0.9.54
+pyperclip>=1.8
+python-dotenv==1.0.1
+telethon>=1.36
+phonenumbers>=8.13
+selenium>=4.15

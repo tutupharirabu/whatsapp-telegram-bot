@@ -1,0 +1,23 @@
+# Environment & credentials
+.env
+
+# Source data (PII players — hanya CSV, script tetap di-track)
+source/*.csv
+example.csv
+
+# Telethon session files
+*.session
+*.session-journal
+
+# Runtime artifacts (session, profile, logs)
+runtime/
+
+# macOS
+.DS_Store
+
+# Command Code
+.commandcode/
+
+# Python
+__pycache__/
+*.pyc
