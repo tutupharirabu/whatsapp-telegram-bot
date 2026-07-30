@@ -41,7 +41,7 @@ def check_whatsapp_single(driver, phone: str, delay: float = 3.0) -> bool:
     return not detect_invalid_number(driver)
 
 
-def check_whatsapp_batch(numbers: List[str], progress_cb=None) -> Dict[str, bool]:
+def check_whatsapp_batch(numbers: List[str], progress_cb=None, skip_interactive: bool = False) -> Dict[str, bool]:
     """
     Cek WhatsApp availability via Selenium.
     Buka satu browser session, iterasi nomor via URL.
@@ -60,6 +60,10 @@ def check_whatsapp_batch(numbers: List[str], progress_cb=None) -> Dict[str, bool
         driver.get("https://web.whatsapp.com")
 
         if not wait_for_wa_ready(driver, timeout=30):
+            if skip_interactive:
+                print("  ❌ WhatsApp Web belum login. Skipping (non-interactive mode).")
+                return {n: False for n in numbers}
+            
             print("\n  ⚠ WhatsApp Web belum login!")
             print("  Silakan scan QR code lalu tekan Enter...")
             input()

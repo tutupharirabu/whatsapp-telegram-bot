@@ -318,6 +318,18 @@ def get_players_unused_numbers() -> List[str]:
     """).fetchall()
     return [r["nomor_normalized"] for r in rows]
 
+def get_unscanned_players() -> List[dict]:
+    """Peserta dari reports yang belum pernah dicek (WA/TG belum ada di players)."""
+    db = get_conn()
+    rows = db.execute("""
+        SELECT dr.nama, dr.nomor_hp, dr.nomor_normalized
+        FROM daily_reports dr
+        LEFT JOIN players p ON p.nomor_normalized = dr.nomor_normalized
+        WHERE p.id IS NULL
+        GROUP BY dr.nomor_normalized
+    """).fetchall()
+    return dicts_from_rows(rows)
+
 
 def get_players_count() -> int:
     db = get_conn()
