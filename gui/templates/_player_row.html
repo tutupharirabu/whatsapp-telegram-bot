@@ -1,0 +1,67 @@
+{% set needs_redeem = p.status_redeem and p.status_redeem.lower() == 'no' %}
+{% set needs_gear = p.lencana_gear and 'no badge' in p.lencana_gear.lower() %}
+{% if needs_redeem and needs_gear %}{% set rtype = 'remind-both' %}
+{% elif needs_redeem %}{% set rtype = 'remind-redeem' %}
+{% elif needs_gear %}{% set rtype = 'remind-gear' %}{% endif %}
+<tr id="row-{{ p.nomor_normalized }}">
+    <td class="max-w-[160px] sm:max-w-none truncate">{{ p.nama }}</td>
+    <td class="num hidden sm:table-cell">{{ p.nomor_hp }}</td>
+    <td class="text-center">
+        {% if p.checked_at %}
+            {% if p.wa_available %}<span class="dot-go">●</span>{% else %}<span class="dot-bad">✗</span>{% endif %}
+        {% else %}<span class="dot-off">—</span>{% endif %}
+    </td>
+    <td class="text-center">
+        {% if p.checked_at %}
+            {% if p.tg_available %}<span class="dot-go">●</span>{% else %}<span class="dot-bad">✗</span>{% endif %}
+        {% else %}<span class="dot-off">—</span>{% endif %}
+    </td>
+    <td class="text-center">
+        {% if p.status_redeem and p.status_redeem.lower() == 'yes' %}<span class="dot-go">✓</span>
+        {% elif needs_redeem %}<span class="dot-bad font-semibold text-xs">No</span>
+        {% else %}<span class="dot-off">—</span>{% endif %}
+    </td>
+    <td class="text-center">
+        {% if p.lencana_gear and 'enterprise' in p.lencana_gear.lower() %}<span class="dot-go">✓</span>
+        {% elif needs_gear %}<span class="dot-bad font-semibold text-xs">No</span>
+        {% else %}<span class="dot-off">—</span>{% endif %}
+    </td>
+    <td class="text-center">
+        <input type="checkbox" {% if p.tg_joined %}checked{% endif %} class="tg-joined-check"
+            hx-post="/api/toggle-tg-joined/{{ p.nomor_normalized }}"
+            hx-target="#row-{{ p.nomor_normalized }}"
+            hx-swap="outerHTML">
+    </td>
+    <td class="text-xs" style="min-width:280px;">
+        {% if not p.tg_joined or rtype %}
+        <div class="flex flex-col gap-1.5">
+            {% if not p.tg_joined %}
+            <div class="action-row">
+                <span class="tag" style="color: var(--iris);">Join Grup</span>
+                <select name="type" class="action-select"
+                    hx-get="/api/player-actions/{{ p.nomor_normalized }}"
+                    hx-target="#action-join-{{ p.nomor_normalized }}"
+                    hx-swap="innerHTML"
+                    aria-label="Pilih tone pesan join grup">
+                    <option value="kasual">Kasual</option>
+                    <option value="formal">Formal</option>
+                </select>
+                <span id="action-join-{{ p.nomor_normalized }}" class="action-row"
+                    hx-get="/api/player-actions/{{ p.nomor_normalized }}?type=kasual"
+                    hx-trigger="load" hx-swap="innerHTML"></span>
+            </div>
+            {% endif %}
+            {% if rtype %}
+            <div class="action-row">
+                <span class="tag" style="color: var(--danger);">
+                    {% if rtype == 'remind-both' %}Redeem + GEAR{% elif rtype == 'remind-redeem' %}Redeem{% else %}GEAR{% endif %}
+                </span>
+                <span id="action-remind-{{ p.nomor_normalized }}" class="action-row"
+                    hx-get="/api/player-actions/{{ p.nomor_normalized }}?type={{ rtype }}"
+                    hx-trigger="load" hx-swap="innerHTML"></span>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}<span class="dot-off">—</span>{% endif %}
+    </td>
+</tr>

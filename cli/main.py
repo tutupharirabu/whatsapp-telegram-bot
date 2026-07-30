@@ -6,8 +6,10 @@ Script utama untuk mengirim pesan otomatis ke WhatsApp dan Telegram.
 
 import argparse
 import sys
-from telegram_bot import send_telegram_message_sync
-from whatsapp_bot import send_whatsapp_message, send_whatsapp_instant
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from bot.telegram_bot import send_telegram_message_sync
+from bot.whatsapp_bot import send_whatsapp_message, send_whatsapp_instant
 
 
 def main():

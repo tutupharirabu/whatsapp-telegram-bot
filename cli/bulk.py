@@ -26,9 +26,12 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
-from checker import check_all, normalize_phone, read_csv
-from telegram_bot import send_telegram_user
-from whatsapp_bot import send_whatsapp_message
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+from bot.utils import normalize_phone, read_csv
+from cli.checker import check_all
+from bot.telegram_bot import send_telegram_user
+from bot.whatsapp_bot import send_whatsapp_message
 
 load_dotenv()
 
@@ -158,7 +161,7 @@ async def send_to_player(
     return result
 
 
-def save_log(results: List[Dict], filepath: str = "runtime/logs/bulk_results.csv") -> None:
+def save_log(results: List[Dict], filepath: str = "../runtime/logs/bulk_results.csv") -> None:
     """Simpan log pengiriman ke CSV."""
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     fieldnames = [

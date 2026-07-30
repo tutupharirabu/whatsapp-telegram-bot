@@ -19,7 +19,7 @@ load_dotenv()
 
 # Default: cari di folder source/
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(SCRIPT_DIR, "source")
+SOURCE_DIR = os.path.join(SCRIPT_DIR, "..", "source")
 
 # Baca dari .env, fallback ke default
 _raw = os.getenv("FASIL_NAMES", "Irfan Zharauri,Nafila Alfirahma")

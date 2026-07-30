@@ -1,0 +1,25 @@
+<p class="eyebrow mb-3">{{ total }} peserta · dari laporan</p>
+
+<div class="panel overflow-x-auto -mx-3 sm:mx-0" style="padding:0;">
+    <table class="data-table min-w-[960px]">
+        <thead>
+            <tr>
+                <th class="min-w-[160px]">Nama</th>
+                <th class="hidden sm:table-cell">Nomor</th>
+                <th class="text-center w-14">WA</th>
+                <th class="text-center w-14">TG</th>
+                <th class="text-center w-20">Redeem</th>
+                <th class="text-center w-20">GEAR</th>
+                <th class="text-center w-24">TG Joined</th>
+                <th class="min-w-[280px]">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in players %}
+                {% include "_player_row.html" %}
+            {% else %}
+            <tr><td colspan="8" class="empty-state">Belum ada peserta. Upload laporan harian dulu.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -44,7 +44,8 @@ async def send_telegram_user(chat_id: int, message: str) -> dict:
     if not api_id or not api_hash:
         raise ValueError("TELEGRAM_API_ID/HASH belum di-set di .env")
 
-    client = TelegramClient("runtime/checker_session", int(api_id), api_hash)
+    session_path = os.path.join(os.path.dirname(__file__), "..", "runtime", "checker_session")
+    client = TelegramClient(session_path, int(api_id), api_hash)
     await client.start(phone=phone or None)
     try:
         sent = await client.send_message(chat_id, message)

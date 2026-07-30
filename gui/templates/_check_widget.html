@@ -1,0 +1,20 @@
+<div id="check-widget" class="flex flex-col gap-2">
+    {% if is_running %}
+    <button disabled class="btn btn-ghost btn-sm w-full opacity-70 cursor-not-allowed">
+        <svg class="w-4 h-4 mr-2 inline animate-spin" style="vertical-align:-3px;" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+            <path d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z" fill="currentColor" opacity="0.75"/>
+        </svg>
+        Sedang memeriksa…
+    </button>
+    <div class="w-full rounded-full h-2 mb-2" style="background: var(--panel-2);">
+        <div class="h-2 rounded-full transition-all duration-500" style="width:{{ ((progress / (total or 1)) * 100) | int }}%; background: var(--iris);"></div>
+    </div>
+    <p class="text-xs" style="color: var(--warn);">⟳ {{ progress }}/{{ total }} nomor sedang diperiksa…</p>
+    {% else %}
+    <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" class="btn btn-primary btn-sm w-full">
+        Cek Semua Peserta
+    </button>
+    <div id="check-result" class="mt-2 text-xs"></div>
+    {% endif %}
+</div>

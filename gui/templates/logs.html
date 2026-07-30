@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block main_width %}max-w-[1200px]{% endblock %}
+{% block content %}
+
+<header class="mb-8">
+    <p class="eyebrow mb-1">History</p>
+    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Riwayat Pengiriman</h1>
+</header>
+
+<div class="panel overflow-hidden">
+    <table class="w-full text-left">
+        <thead>
+            <tr>
+                <th>Waktu</th>
+                <th>Nomor HP</th>
+                <th>Platform</th>
+                <th>Pesan (Preview)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td class="whitespace-nowrap" style="color: var(--fg-dim);">{{ log.timestamp | truncate(19, True, '') }}</td>
+                <td class="font-medium">{{ log.nomor_hp }}</td>
+                <td>
+                    {% if log.platform == 'wa' %}
+                        <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded bg-[var(--wa-green)] bg-opacity-10 text-[var(--wa-green)]">WhatsApp</span>
+                    {% else %}
+                        <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded bg-[var(--tg-blue)] bg-opacity-10 text-[var(--tg-blue)]">Telegram</span>
+                    {% endif %}
+                </td>
+                <td class="truncate max-w-[300px]" style="color: var(--fg-dim);">{{ log.msg_preview }}</td>
+                <td>
+                    {% if log.status == 'SUCCESS' %}
+                        <span class="text-[var(--wa-green)] text-xs font-bold">✓ SUCCESS</span>
+                    {% else %}
+                        <span class="text-[var(--error)] text-xs font-bold">✗ FAILED</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center italic" style="color: var(--fg-dim); padding: 2rem;">Belum ada riwayat pengiriman.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

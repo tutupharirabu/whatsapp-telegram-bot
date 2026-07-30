@@ -18,7 +18,7 @@ import os
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(SCRIPT_DIR, "source")
+SOURCE_DIR = os.path.join(SCRIPT_DIR, "..", "source")
 
 
 def scan_reminders(report_path: str) -> list:
