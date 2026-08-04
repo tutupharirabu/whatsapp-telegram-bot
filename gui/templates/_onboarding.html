@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
+    <title>GCAF Auto Messenger — Mulai</title>
+    <script src="/static/vendor/tailwindcss.js"></script>
+    <script src="/static/vendor/htmx.js"></script>
+    <link rel="stylesheet" href="/static/tokens.css">
+</head>
+<body>
+<div class="onboarding-container">
+    <div class="onboarding-card panel">
+        <!-- Header -->
+        <div class="onboarding-header">
+            <div class="welcome-badge">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span class="eyebrow">Selamat Datang</span>
+            </div>
+            <h1 class="onboarding-title">Mulai dengan Upload Data</h1>
+            <p class="onboarding-subtitle">
+                Upload laporan harian untuk mengisi database peserta GCAF 2026.
+            </p>
+        </div>
+
+        <!-- Upload Zone -->
+        <form id="upload-form" hx-post="/upload" hx-target="#upload-result" hx-swap="innerHTML"
+              hx-disabled-elt="#upload-submit-btn"
+              enctype="multipart/form-data" class="onboarding-form">
+
+            <label for="csv-file" class="upload-zone" id="upload-zone">
+                <input type="file" id="csv-file" name="file" accept=".csv" required class="upload-input">
+
+                <div class="upload-content">
+                    <div class="upload-icon-wrapper">
+                        <svg class="upload-icon upload-icon-default" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <svg class="upload-icon upload-icon-picked" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+
+                    <div class="upload-text">
+                        <span class="upload-label">Pilih File CSV</span>
+                        <span class="upload-hint">atau drag &amp; drop di sini</span>
+                    </div>
+
+                    <div class="upload-info">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Format: CSV dengan kolom Nama, No. HP, Email</span>
+                    </div>
+                </div>
+            </label>
+
+            <button type="submit" id="upload-submit-btn" class="btn btn-primary btn-upload">
+                <span class="btn-label-idle">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    Upload Data
+                </span>
+                <span class="btn-label-loading">
+                    <span class="spinner"></span>
+                    Mengunggah&hellip;
+                </span>
+            </button>
+        </form>
+
+        <div id="upload-result" class="upload-result"></div>
+
+        <script>
+            (function () {
+                var input = document.getElementById('csv-file');
+                var zone = document.getElementById('upload-zone');
+                var labelEl = zone.querySelector('.upload-label');
+                var hintEl = zone.querySelector('.upload-hint');
+                var defaultLabel = labelEl.textContent;
+                var defaultHint = hintEl.textContent;
+
+                input.addEventListener('change', function () {
+                    var file = input.files && input.files[0];
+                    if (!file) {
+                        labelEl.textContent = defaultLabel;
+                        hintEl.textContent = defaultHint;
+                        zone.classList.remove('has-file');
+                        return;
+                    }
+                    labelEl.textContent = file.name;
+                    hintEl.textContent = (file.size / 1024).toFixed(1) + ' KB — siap diunggah';
+                    zone.classList.add('has-file');
+                });
+
+                document.getElementById('upload-form').addEventListener('reset', function () {
+                    labelEl.textContent = defaultLabel;
+                    hintEl.textContent = defaultHint;
+                    zone.classList.remove('has-file');
+                });
+            })();
+        </script>
+
+        <!-- Next step hint -->
+        <p class="onboarding-next">
+            Setelah upload berhasil, lanjut ke halaman <strong>Peserta</strong> untuk verifikasi status &amp; kirim pesan.
+        </p>
+    </div>
+</div>
+
+<style>
+    .onboarding-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .onboarding-card {
+        max-width: 560px;
+        width: 100%;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .onboarding-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--iris), var(--tg-blue));
+        opacity: 0.8;
+    }
+
+    .onboarding-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, rgba(94, 106, 210, 0.1), rgba(0, 136, 204, 0.1));
+        border: 1px solid rgba(94, 106, 210, 0.3);
+        border-radius: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .welcome-badge svg {
+        color: var(--iris);
+    }
+
+    .onboarding-title {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+        color: var(--fg-main);
+        background: linear-gradient(135deg, var(--fg-main), var(--fg-dim));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    @supports not (background-clip: text) {
+        .onboarding-title {
+            -webkit-text-fill-color: var(--fg-main);
+        }
+    }
+
+    .onboarding-subtitle {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--fg-dim);
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .onboarding-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .upload-zone {
+        position: relative;
+        display: block;
+        cursor: pointer;
+        background: var(--panel-2);
+        border: 2px dashed var(--border);
+        border-radius: 0.75rem;
+        padding: 2.5rem 2rem;
+        transition: all 0.25s ease;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--iris);
+        background: linear-gradient(135deg, rgba(94, 106, 210, 0.05), rgba(0, 136, 204, 0.05));
+        transform: translateY(-2px);
+    }
+
+    .upload-zone:focus-within {
+        border-color: var(--iris);
+        box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.15);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .upload-zone:hover {
+            transform: none;
+        }
+    }
+
+    .upload-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .upload-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        pointer-events: none;
+    }
+
+    .upload-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(94, 106, 210, 0.15), rgba(0, 136, 204, 0.15));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+    }
+
+    .upload-zone:hover .upload-icon-wrapper {
+        background: linear-gradient(135deg, rgba(94, 106, 210, 0.25), rgba(0, 136, 204, 0.25));
+        transform: scale(1.05);
+    }
+
+    .upload-icon {
+        width: 32px;
+        height: 32px;
+        color: var(--iris);
+    }
+
+    .upload-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .upload-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--fg-main);
+    }
+
+    .upload-hint {
+        font-size: 0.875rem;
+        color: var(--fg-dim);
+    }
+
+    .upload-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(94, 106, 210, 0.08);
+        border-radius: 0.5rem;
+        font-size: 0.8125rem;
+        color: var(--fg-dim);
+        border: 1px solid rgba(94, 106, 210, 0.15);
+    }
+
+    .upload-info svg {
+        flex-shrink: 0;
+        color: var(--iris);
+    }
+
+    .btn-upload {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .btn-label-idle,
+    .btn-label-loading {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-label-loading {
+        display: none;
+    }
+
+    .btn-label-loading .spinner {
+        border-color: rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+    }
+
+    #upload-submit-btn:disabled {
+        cursor: wait;
+        opacity: 0.85;
+    }
+
+    #upload-submit-btn:disabled .btn-label-idle {
+        display: none;
+    }
+
+    #upload-submit-btn:disabled .btn-label-loading {
+        display: inline-flex;
+    }
+
+    #upload-submit-btn:disabled .btn-label-loading .spinner {
+        display: inline-block;
+    }
+
+    /* File picked state */
+    .upload-icon-picked {
+        display: none;
+    }
+
+    .upload-zone.has-file {
+        border-style: solid;
+        border-color: rgba(37, 211, 102, 0.45);
+        background: linear-gradient(135deg, rgba(37, 211, 102, 0.07), rgba(37, 211, 102, 0.02));
+    }
+
+    .upload-zone.has-file .upload-icon-wrapper {
+        background: linear-gradient(135deg, rgba(37, 211, 102, 0.2), rgba(37, 211, 102, 0.1));
+    }
+
+    .upload-zone.has-file .upload-icon-default {
+        display: none;
+    }
+
+    .upload-zone.has-file .upload-icon-picked {
+        display: block;
+        color: var(--wa-green);
+    }
+
+    .upload-zone.has-file .upload-label {
+        color: var(--wa-green);
+    }
+
+    .upload-result {
+        min-height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Upload result panel (success / empty / error) */
+    .result-panel {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 0.625rem;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        text-align: left;
+        animation: result-in 0.3s ease;
+    }
+
+    @keyframes result-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .result-panel { animation: none; }
+    }
+
+    .result-icon {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .result-icon-success { background: rgba(37, 211, 102, 0.15); color: var(--wa-green); }
+    .result-icon-warn { background: rgba(234, 179, 8, 0.15); color: var(--warn); }
+    .result-icon-error { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+    .result-panel.result-success { border-color: rgba(37, 211, 102, 0.3); }
+    .result-panel.result-empty { border-color: rgba(234, 179, 8, 0.3); }
+    .result-panel.result-error { border-color: rgba(239, 68, 68, 0.3); }
+
+    .result-body { display: flex; flex-direction: column; gap: 0.2rem; }
+    .result-title { font-size: 0.9rem; font-weight: 600; color: var(--fg-main); }
+    .result-detail { font-size: 0.8125rem; color: var(--fg-dim); line-height: 1.5; }
+    .result-link {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--iris);
+        margin-top: 0.35rem;
+        display: inline-block;
+    }
+    .result-link:hover { text-decoration: underline; }
+
+    .onboarding-next {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8125rem;
+        color: var(--fg-dim);
+    }
+
+    .onboarding-next strong {
+        color: var(--fg-main);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .onboarding-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .onboarding-title {
+            font-size: 1.5rem;
+        }
+
+        .upload-zone {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+</body>
+</html>

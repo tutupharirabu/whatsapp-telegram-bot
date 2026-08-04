@@ -5,11 +5,14 @@ Script utama untuk mengirim pesan otomatis ke WhatsApp dan Telegram.
 """
 
 import argparse
-import sys
 import os
+import sys
+from typing import Any
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
 from bot.telegram_bot import send_telegram_message_sync
-from bot.whatsapp_bot import send_whatsapp_message, send_whatsapp_instant
+from bot.whatsapp_bot import send_whatsapp_message
 
 
 def main():
@@ -27,9 +30,6 @@ Contoh:
 
   # Kirim ke WA + Telegram sekaligus
   python main.py --wa 6281234567890 --tg @username --message "Broadcast!"
-
-  # WA mode instant
-  python main.py --wa 6281234567890 --message "Pesan" --instant-wa
         """,
     )
 
@@ -50,11 +50,6 @@ Contoh:
         help="Isi pesan yang akan dikirim",
     )
     parser.add_argument(
-        "--instant-wa",
-        action="store_true",
-        help="Kirim WhatsApp secara instant via pyautogui",
-    )
-    parser.add_argument(
         "--wait",
         type=int,
         default=15,
@@ -66,24 +61,19 @@ Contoh:
     if not args.wa and not args.tg:
         parser.error("Minimal satu tujuan harus diisi: --wa atau --tg")
 
-    results = {"whatsapp": None, "telegram": None}
+    results: dict[str, Any] = {"whatsapp": None, "telegram": None}
 
     if args.wa:
         print(f"\nMengirim WhatsApp ke {args.wa}...")
         try:
-            if args.instant_wa:
-                result = send_whatsapp_instant(args.wa, args.message, wait_time=args.wait)
-            else:
-                result = send_whatsapp_message(args.wa, args.message, wait_time=args.wait)
+            result = send_whatsapp_message(args.wa, args.message, wait_time=args.wait)
 
             results["whatsapp"] = result
             if result["status"] == "success":
                 print(f"  WA: Terkirim ke {result['phone']}")
-                if "scheduled_for" in result:
-                    print(f"  Dijadwalkan: {result['scheduled_for']}")
             else:
                 print(f"  WA: Gagal - {result.get('error', 'Unknown')}")
-        except Exception as e:
+        except (ValueError, OSError, RuntimeError) as e:
             print(f"  WA Exception: {e}")
             results["whatsapp"] = {"status": "error", "error": str(e)}
 
@@ -92,10 +82,10 @@ Contoh:
         try:
             result = send_telegram_message_sync(args.tg, args.message)
             results["telegram"] = result
-            print(f"  TG: Terkirim!")
+            print("  TG: Terkirim!")
             print(f"  Chat ID: {result['chat_id']}")
             print(f"  Message ID: {result['message_id']}")
-        except Exception as e:
+        except (ValueError, OSError, RuntimeError) as e:
             print(f"  TG Exception: {e}")
             results["telegram"] = {"status": "error", "error": str(e)}
 

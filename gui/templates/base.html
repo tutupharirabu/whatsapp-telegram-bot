@@ -3,82 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
     <title>GCAF Auto Messenger</title>
     <script src="/static/vendor/tailwindcss.js"></script>
     <script src="/static/vendor/htmx.js"></script>
-    <style>
-        :root {
-            --bg-body: #0a0a0a;
-            --panel: #111111;
-            --panel-2: #1a1a1a;
-            --fg-main: #f5f5f5;
-            --fg-dim: #a3a3a3;
-            --border: #262626;
-            --iris: #5e6ad2;
-            --wa-green: #25D366;
-            --tg-blue: #0088cc;
-            --warn: #eab308;
-            --error: #ef4444;
-            --danger: #ef4444;
-        }
-        body {
-            background-color: var(--bg-body);
-            color: var(--fg-main);
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            line-height: 1.6;
-        }
-        .container-base { margin: 0 auto; padding: 2rem; }
-        .eyebrow { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--iris); font-weight: 700; }
-        .panel { background-color: var(--panel); border: 1px solid var(--border); border-radius: 0.5rem; }
-        .field { background-color: var(--panel-2); border: 1px solid var(--border); color: var(--fg-main); padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; }
-        .field:focus { outline: none; border-color: var(--iris); box-shadow: 0 0 0 1px var(--iris); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 500; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s ease; }
-        .btn-primary { background-color: var(--iris); color: white; border: 1px solid transparent; }
-        .btn-primary:hover { background-color: #4b55a8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(94, 106, 210, 0.3); }
-        .btn-ghost { background-color: transparent; border: 1px solid var(--border); color: var(--fg-main); }
-        .btn-ghost:hover { background-color: var(--panel-2); border-color: #404040; }
-        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.75rem; text-transform: uppercase; color: var(--fg-dim); font-weight: 600; letter-spacing: 0.05em; }
-        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
-        tr:hover td { background-color: var(--panel-2); }
-        
-        
-        /* Data Table & Dots */
-        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .dot-go { color: var(--wa-green); font-weight: 700; font-size: 1.1em; }
-        .dot-bad { color: var(--danger); font-weight: 700; }
-        .dot-off { color: var(--fg-dim); opacity: 0.5; }
-        .num { font-variant-numeric: tabular-nums; }
-        
-        /* Actions */
-        .action-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-        .action-select { background-color: var(--panel-2); border: 1px solid var(--border); color: var(--fg-main); padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; transition: border-color 0.15s; }
-        .action-select:hover { border-color: var(--iris); }
-        .action-select:focus { outline: none; border-color: var(--iris); }
-        .tag { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.03em; padding: 0.15rem 0.4rem; background: var(--panel-2); border: 1px solid var(--border); border-radius: 0.25rem; white-space: nowrap; }
-        .empty-state { padding: 3rem; text-align: center; color: var(--fg-dim); border: 1px dashed var(--border); border-radius: 0.5rem; font-size: 0.875rem; }
-        
-        /* Loading States */
-        .spinner { display: inline-block; width: 1rem; height: 1rem; border: 2px solid var(--border); border-top-color: var(--iris); border-radius: 50%; animation: spin 0.6s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .htmx-request .spinner { display: inline-block; }
-        .htmx-request.btn { opacity: 0.7; cursor: wait; }
-        /* Layout */
-        .layout-grid { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-        .sidebar { background-color: var(--panel); border-right: 1px solid var(--border); padding: 2rem 1rem; display: flex; flex-direction: column; }
-        .nav-item { display: block; padding: 0.6rem 1rem; margin-bottom: 0.25rem; border-radius: 0.375rem; color: var(--fg-dim); font-size: 0.875rem; font-weight: 500; transition: all 0.2s ease; text-decoration: none; }
-        .nav-item:hover { background-color: var(--panel-2); color: var(--fg-main); transform: translateX(2px); }
-        .nav-item.active { background-color: var(--panel-2); color: var(--iris); font-weight: 600; border-left: 2px solid var(--iris); padding-left: calc(1rem - 2px); }
-    </style>
+    <link rel="stylesheet" href="/static/tokens.css">
 </head>
 <body class="layout-grid">
+    <a href="#main-content" class="skip-link">Langsung ke konten</a>
     <aside class="sidebar">
         <div class="mb-8 px-4">
             <h1 class="text-xl font-bold tracking-tight">GCAF 2026</h1>
-            <p class="text-xs mt-1" style="color: var(--fg-dim);">Auto Messenger</p>
+            <p class="text-xs mt-1 text-dim">Auto Messenger</p>
         </div>
         <nav>
             <a href="/" class="nav-item {% if request.url.path == '/' %}active{% endif %}">Dashboard</a>
@@ -87,7 +23,7 @@
             <a href="/logs" class="nav-item {% if request.url.path == '/logs' %}active{% endif %}">Riwayat</a>
         </nav>
     </aside>
-    <main class="container-base {% block main_width %}max-w-4xl{% endblock %}">
+    <main id="main-content" class="container-base {% block main_width %}max-w-4xl{% endblock %}">
         {% block content %}{% endblock %}
     </main>
 </body>

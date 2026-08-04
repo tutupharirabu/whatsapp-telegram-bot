@@ -27,30 +27,39 @@
         {% else %}<span class="dot-off">—</span>{% endif %}
     </td>
     <td class="text-center">
-        <input type="checkbox" {% if p.tg_joined %}checked{% endif %} class="tg-joined-check"
+        <input type="checkbox" aria-label="Tandai {{ p.nama }}" {% if p.tg_joined %}checked{% endif %} class="tg-joined-check"
             hx-post="/players/toggle-tg/{{ p.nomor_normalized }}"
             hx-target="#row-{{ p.nomor_normalized }}"
             hx-swap="outerHTML">
     </td>
-    <td class="text-xs" style="min-width:280px;">
+    <td class="text-xs" style="min-width:320px;">
         {% if not p.tg_joined or rtype %}
         <div class="flex flex-col gap-1.5">
             {% if not p.tg_joined %}
             <div class="action-row">
-                <span class="tag" style="color: var(--iris);">Join Grup</span>
-                <select name="type" class="action-select" aria-label="Pilih tone pesan join grup">
+                <span class="tag text-iris">Join Grup</span>
+                <select name="type" class="action-select" aria-label="Pilih tone pesan join grup"
+                    hx-get="/api/message-preview/{{ p.nomor_normalized }}"
+                    hx-target="#action-join-{{ p.nomor_normalized }}"
+                    hx-swap="innerHTML"
+                    hx-trigger="change">
                     <option value="kasual">Kasual</option>
                     <option value="formal">Formal</option>
                 </select>
-                <span class="text-xs text-gray-400">Template belum tersedia</span>
+                <span id="action-join-{{ p.nomor_normalized }}"
+                    hx-get="/api/message-preview/{{ p.nomor_normalized }}?type=kasual"
+                    hx-trigger="load" hx-swap="innerHTML"></span>
             </div>
             {% endif %}
             {% if rtype %}
             <div class="action-row">
-                <span class="tag" style="color: var(--danger);">
+                <span class="tag text-danger">
                     {% if rtype == 'remind-both' %}Redeem + GEAR{% elif rtype == 'remind-redeem' %}Redeem{% else %}GEAR{% endif %}
                 </span>
-                <span class="text-xs text-gray-400">Template belum tersedia</span>
+                <!-- remind tidak punya pilihan template (tone ditentukan status peserta), jadi preview dimuat sekali saat render agar tombol kirim tetap tersedia -->
+                <span id="action-remind-{{ p.nomor_normalized }}"
+                    hx-get="/api/message-preview/{{ p.nomor_normalized }}?type={{ rtype }}"
+                    hx-trigger="load" hx-swap="innerHTML"></span>
             </div>
             {% endif %}
         </div>

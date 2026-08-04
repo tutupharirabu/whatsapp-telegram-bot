@@ -4,11 +4,13 @@
 <header class="mb-8">
     <p class="eyebrow mb-1">Messaging</p>
     <h1 class="text-2xl sm:text-3xl font-bold mb-1">Template Pesan</h1>
-    <p class="text-sm" style="color: var(--fg-dim);">Kelola template pesan untuk pengiriman massal WhatsApp dan Telegram.</p>
+    <p class="text-sm text-dim">Sunting template pesan yang dikirim ke peserta. Placeholder <code class="px-1 rounded text-xs font-mono" style="background: var(--panel-2);">{nama} {nama_fasil} {kode_fasil}</code> akan diganti otomatis.</p>
 </header>
 
-<div class="panel p-6 max-w-2xl">
-    <p class="text-sm" style="color: var(--fg-dim);">Fitur ini dalam pengembangan. Gunakan CLI <code class="px-1 py-0.5 rounded text-xs font-mono" style="background: var(--panel-2);">cli/bulk.py</code> untuk pengiriman massal sementara waktu.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for key, tpl in templates.items() %}
+        {% include "_template_card.html" %}
+    {% endfor %}
 </div>
 
 {% endblock %}

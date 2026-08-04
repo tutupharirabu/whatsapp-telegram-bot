@@ -5,7 +5,7 @@ Scan Arcade Daily Report untuk pemain yang butuh reminder:
 - Lencana Digital GEAR = "No Badge" → reminder badge
 
 Output: CSV dengan format nama,nomor_hp,reminder_type
-Lalu bisa dipakai bulk.py untuk kirim pesan pengingat.
+Lalu bisa dipakai send.py untuk kirim pesan pengingat.
 
 Usage:
     python source/check_reminders.py
@@ -18,6 +18,10 @@ import os
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(SCRIPT_DIR, ".."))
+
+from bot.utils import get_col, normalize_phone, read_csv_rows
+
 SOURCE_DIR = os.path.join(SCRIPT_DIR, "..", "source")
 
 
@@ -28,39 +32,45 @@ def scan_reminders(report_path: str) -> list:
         sys.exit(1)
 
     reminders = []
+    seen_phones = set()
     total = 0
     redeem_no = 0
     gear_no = 0
 
-    with open(report_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            nama = row.get("Nama Peserta", "").strip()
-            hp = row.get("Nomor HP Peserta", "").strip()
-            redeem = row.get("Status Redeem Kode Akses", "").strip()
-            gear = row.get("Lencana Digital GEAR yang diraih", "").strip()
+    for row in read_csv_rows(report_path):
+        nama = (get_col(row, "nama") or "").strip()
+        hp = (get_col(row, "hp") or "").strip()
+        redeem = (get_col(row, "status_redeem") or "").strip()
+        gear = (get_col(row, "lencana_gear") or "").strip()
 
-            if not hp:
-                continue
-            total += 1
+        if not hp:
+            continue
+        total += 1
 
-            reminder_types = []
+        reminder_types = []
 
-            if redeem.lower() == "no":
-                reminder_types.append("redeem")
-                redeem_no += 1
+        if redeem.lower() == "no":
+            reminder_types.append("redeem")
+            redeem_no += 1
 
-            gear_lower = gear.lower()
-            if gear_lower in ("no badge", "", "none"):
-                reminder_types.append("gear")
-                gear_no += 1
+        gear_lower = gear.lower()
+        if gear_lower in ("no badge", "", "none"):
+            reminder_types.append("gear")
+            gear_no += 1
 
-            if reminder_types:
-                reminders.append({
-                    "nama": nama,
-                    "nomor_hp": hp,
-                    "reminder_type": ",".join(reminder_types),
-                })
+        if not reminder_types:
+            continue
+
+        # Dedup per nomor (bisa muncul beberapa kali di report): gabung tipe reminder
+        norm = normalize_phone(hp)
+        if norm in seen_phones:
+            continue
+        seen_phones.add(norm)
+        reminders.append({
+            "nama": nama,
+            "nomor_hp": hp,
+            "reminder_type": ",".join(reminder_types),
+        })
 
     print(f"Total pemain       : {total}")
     print(f"Belum redeem       : {redeem_no}")

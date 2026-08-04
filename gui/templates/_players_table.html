@@ -1,6 +1,6 @@
 <p class="eyebrow mb-3">{{ total }} peserta · dari laporan</p>
 
-<div class="panel overflow-x-auto -mx-3 sm:mx-0" style="padding:0;">
+<div class="panel overflow-x-auto -mx-3 sm:mx-0 p-0">
     <table class="data-table min-w-[960px]">
         <thead>
             <tr>
@@ -23,3 +23,19 @@
         </tbody>
     </table>
 </div>
+
+{% if has_prev or has_next %}
+<div class="flex items-center justify-between gap-3 mt-4 px-1">
+    {% if has_prev %}
+    <button class="btn btn-ghost btn-sm" hx-get="/players?search={{ search|urlencode }}&amp;offset={{ offset - limit }}" hx-target="#player-table" hx-swap="innerHTML">← Sebelumnya</button>
+    {% else %}
+    <button class="btn btn-ghost btn-sm opacity-40 cursor-not-allowed" disabled>← Sebelumnya</button>
+    {% endif %}
+    <span class="text-xs text-dim">Hal {{ (offset // limit) + 1 }} · {{ offset + 1 }}–{{ [offset + limit, total]|min }} dari {{ total }}</span>
+    {% if has_next %}
+    <button class="btn btn-ghost btn-sm" hx-get="/players?search={{ search|urlencode }}&amp;offset={{ offset + limit }}" hx-target="#player-table" hx-swap="innerHTML">Berikutnya →</button>
+    {% else %}
+    <button class="btn btn-ghost btn-sm opacity-40 cursor-not-allowed" disabled>Berikutnya →</button>
+    {% endif %}
+</div>
+{% endif %}

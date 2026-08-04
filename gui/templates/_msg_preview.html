@@ -1,0 +1,26 @@
+<div class="flex flex-col gap-1.5">
+    {% if type == 'remind-both' %}<span class="tag text-danger mb-0.5">Redeem + GEAR</span>{% endif %}
+    <div class="text-xs leading-relaxed overflow-hidden max-h-[120px] text-dim">"{{ msg_wa[:200] }}{% if msg_wa|length > 200 %}…{% endif %}"</div>
+    <div class="flex gap-2 mt-1 items-center">
+        {% if player.wa_available %}
+        <button class="btn btn-ghost btn-sm py-1 text-wa"
+            hx-post="/api/send-wa/{{ player.nomor_normalized }}?type={{ type }}"
+            hx-target="#send-result-{{ player.nomor_normalized }}"
+            hx-swap="innerHTML"
+            hx-indicator="#send-spin-{{ player.nomor_normalized }}"
+            hx-disabled-elt="this">
+            💬 WA</button>
+        {% endif %}
+        {% if player.tg_available and player.tg_user_id %}
+        <button class="btn btn-ghost btn-sm py-1 text-tg"
+            hx-post="/api/send-tg/{{ player.nomor_normalized }}?type={{ type }}"
+            hx-target="#send-result-{{ player.nomor_normalized }}"
+            hx-swap="innerHTML"
+            hx-indicator="#send-spin-{{ player.nomor_normalized }}"
+            hx-disabled-elt="this">
+            📨 TG</button>
+        {% endif %}
+        <span id="send-spin-{{ player.nomor_normalized }}" class="spinner"></span>
+        <span id="send-result-{{ player.nomor_normalized }}" class="text-xs text-dim"></span>
+    </div>
+</div>

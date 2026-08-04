@@ -6,55 +6,18 @@
     <h1 class="text-2xl sm:text-3xl font-bold mb-1">Dashboard</h1>
 </header>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-    <div class="panel p-5">
-        <p class="text-sm font-medium mb-1" style="color: var(--fg-dim);">Total Peserta Import</p>
-        <p class="text-3xl font-bold">{{ stats.total_players }}</p>
-    </div>
-    <div class="panel p-5">
-        <p class="text-sm font-medium mb-1" style="color: var(--fg-dim);">WA Aktif</p>
-        <p class="text-3xl font-bold" style="color: var(--wa-green);">{{ stats.wa_registered }}</p>
-        <p class="text-xs mt-1" style="color: var(--fg-dim);">Terdaftar WA</p>
-    </div>
-    <div class="panel p-5">
-        <p class="text-sm font-medium mb-1" style="color: var(--fg-dim);">TG Aktif / Join</p>
-        <p class="text-3xl font-bold" style="color: var(--tg-blue);">{{ stats.tg_registered }} / {{ stats.tg_joined_count }}</p>
-        <p class="text-xs mt-1" style="color: var(--fg-dim);">Terdaftar TG / Masuk Grup</p>
-    </div>
-</div>
+{% include "_dashboard_stats.html" %}
+
+{% include "_dashboard_upload.html" %}
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div class="panel p-5">
         <h2 class="text-lg font-semibold mb-4">Pengecekan Status</h2>
-        <p class="text-sm mb-4" style="color: var(--fg-dim);">Lakukan pengecekan ketersediaan WA dan Telegram untuk peserta baru.</p>
+        <p class="text-sm mb-4 text-dim">Lakukan pengecekan ketersediaan WA dan Telegram untuk peserta baru.</p>
         {% include "_check_widget.html" %}
     </div>
-    
-    <div class="panel p-5">
-        <h2 class="text-lg font-semibold mb-4">Riwayat Terbaru</h2>
-        {% if logs %}
-            <div class="flex flex-col gap-3">
-                {% for log in logs %}
-                <div class="flex items-center justify-between text-sm pb-3 border-b border-[var(--border)] last:border-0 last:pb-0">
-                    <div>
-                        <p class="font-medium">{{ log.platform | upper }} <span class="text-xs ml-1" style="color: var(--fg-dim);">ke</span> {{ log.nomor_hp }}</p>
-                        <p class="text-xs mt-0.5 truncate max-w-[200px]" style="color: var(--fg-dim);">{{ log.msg_preview }}</p>
-                    </div>
-                    <div>
-                        {% if log.status == 'SUCCESS' %}
-                            <span class="inline-block px-2 py-1 rounded text-xs font-medium bg-[var(--wa-green)] bg-opacity-20 text-[var(--wa-green)]">Terkirim</span>
-                        {% else %}
-                            <span class="inline-block px-2 py-1 rounded text-xs font-medium bg-[var(--error)] bg-opacity-20 text-[var(--error)]">Gagal</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            <a href="/logs" class="text-xs font-medium mt-4 inline-block hover:underline" style="color: var(--iris);">Lihat semua &rarr;</a>
-        {% else %}
-            <p class="text-sm italic" style="color: var(--fg-dim);">Belum ada riwayat pengiriman.</p>
-        {% endif %}
-    </div>
+
+    {% include "_dashboard_logs.html" %}
 </div>
 
 {% endblock %}

@@ -1,20 +1,43 @@
+{% set pct = ((progress / (total or 1)) * 100) | int %}
 <div id="check-widget" class="flex flex-col gap-2">
-    {% if is_running %}
-    <button disabled class="btn btn-ghost btn-sm w-full opacity-70 cursor-not-allowed">
-        <svg class="w-4 h-4 mr-2 inline animate-spin" style="vertical-align:-3px;" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
-            <path d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z" fill="currentColor" opacity="0.75"/>
-        </svg>
-        Sedang memeriksa…
-    </button>
-    <div class="w-full rounded-full h-2 mb-2" style="background: var(--panel-2);">
-        <div class="h-2 rounded-full transition-all duration-500" style="width:{{ ((progress / (total or 1)) * 100) | int }}%; background: var(--iris);"></div>
+    {% if error %}
+    <div class="panel p-4 border-danger">
+        <p class="text-sm font-semibold mb-1 text-danger">Gagal</p>
+        <p class="text-xs text-dim">{{ error }}</p>
+        <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-ghost btn-sm mt-2">Coba Lagi</button>
     </div>
-    <p class="text-xs" style="color: var(--warn);">⟳ {{ progress }}/{{ total }} nomor sedang diperiksa…</p>
+    {% elif status == 'stale' %}
+    <div class="panel p-4 border-danger">
+        <p class="text-sm font-semibold mb-1 text-danger">Pengecekan macet</p>
+        <p class="text-xs text-dim">Proses terakhir tidak selesai dalam 30 menit. Mulai ulang pengecekan?</p>
+        <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm mt-2">Mulai Pengecekan</button>
+    </div>
+    {% elif is_running %}
+    <div hx-get="/check/status" hx-trigger="every 2s" hx-swap="outerHTML">
+        <button disabled class="btn btn-ghost btn-sm w-full opacity-70 cursor-not-allowed">
+            <svg class="w-4 h-4 mr-2 inline animate-spin align-[-3px]" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+                <path d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z" fill="currentColor" opacity="0.75"/>
+            </svg>
+            {% if phase == 'whatsapp' %}Memeriksa WhatsApp…
+            {% elif phase == 'telegram' %}Memeriksa Telegram…
+            {% else %}Sedang memeriksa…{% endif %}
+        </button>
+        <div class="progress-track">
+            <div class="progress-fill" style="width:{{ pct }}%;"></div>
+        </div>
+        <p class="text-xs" style="color: var(--warn);">⟳ {{ progress }}/{{ total }} selesai</p>
+    </div>
+    {% elif status == 'done' %}
+    <div class="flex flex-col gap-2" hx-get="/check/status" hx-trigger="every 5s" hx-swap="outerHTML">
+        <p class="text-xs text-wa">✓ Pemeriksaan selesai — {{ progress }} dari {{ total }} nomor.</p>
+        <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm w-full">
+            Cek Semua Peserta
+        </button>
+    </div>
     {% else %}
-    <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" class="btn btn-primary btn-sm w-full">
+    <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm w-full">
         Cek Semua Peserta
     </button>
-    <div id="check-result" class="mt-2 text-xs"></div>
     {% endif %}
 </div>

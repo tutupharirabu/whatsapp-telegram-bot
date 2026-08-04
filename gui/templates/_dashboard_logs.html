@@ -1,0 +1,29 @@
+<div id="dashboard-logs" 
+     class="panel p-5"
+     hx-get="/api/dashboard-logs"
+     hx-trigger="update-dashboard from:body"
+     hx-swap="outerHTML">
+    <h2 class="text-lg font-semibold mb-4">Riwayat Terbaru</h2>
+    {% if logs %}
+        <div class="flex flex-col gap-3">
+            {% for log in logs %}
+            <div class="flex items-center justify-between text-sm pb-3 border-b border-[var(--border)] last:border-0 last:pb-0">
+                <div>
+                    <p class="font-medium">{{ log.platform | upper }} <span class="text-xs ml-1 text-dim">ke</span> {{ log.nomor_hp }}</p>
+                    <p class="text-xs mt-0.5 truncate max-w-[200px] text-dim">{{ log.msg_preview }}</p>
+                </div>
+                <div>
+                    {% if log.status == 'SUCCESS' %}
+                        <span class="badge badge-success">Terkirim</span>
+                    {% else %}
+                        <span class="badge badge-error">Gagal</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <a href="/logs" class="text-xs font-medium mt-4 inline-block hover:underline text-iris">Lihat semua &rarr;</a>
+    {% else %}
+        <div class="empty-state">Belum ada riwayat pengiriman.</div>
+    {% endif %}
+</div>
