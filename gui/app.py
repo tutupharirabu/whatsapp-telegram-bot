@@ -26,7 +26,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 from bot import db
 from bot.whatsapp_bot import send_whatsapp_instant
-from gui.checker_async import get_check_status, start_check_background, stop_check_background
+from gui.checker_async import (
+    get_check_status,
+    start_check_background,
+    stop_check_background,
+)
 
 load_dotenv()
 

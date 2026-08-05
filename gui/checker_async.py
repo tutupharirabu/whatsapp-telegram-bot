@@ -128,10 +128,10 @@ def _run_check_worker(players: list[dict]):
             "progress": current, "total": total, "error": "",
         })
 
+    current_phase = "whatsapp"
     try:
         from cli.checker import check_telegram_batch, check_whatsapp_batch
 
-        current_phase = "whatsapp"
         # WA check
         _write_status({"status": "running", "phase": "whatsapp", "progress": 0, "total": total, "error": ""})
         wa_results = check_whatsapp_batch(numbers, progress_cb=_progress_cb, skip_interactive=True)
