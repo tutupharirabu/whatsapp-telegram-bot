@@ -254,6 +254,8 @@ def get_players_summary(search: str = "", limit: int = 200, offset: int = 0) -> 
             """SELECT
                 dr.nama, dr.email, dr.nomor_hp, dr.nomor_normalized,
                 dr.status_redeem, dr.lencana_gear,
+                dr.milestone, dr.bonus_milestone, dr.status_verifikasi_ai_agent,
+                dr.jumlah_lencana, dr.jumlah_arcade_game,
                 COALESCE(p.wa_available, 0) as wa_available,
                 COALESCE(p.tg_available, 0) as tg_available,
                 p.tg_user_id, COALESCE(p.tg_joined, 0) as tg_joined, p.updated_at as checked_at,
@@ -263,6 +265,8 @@ def get_players_summary(search: str = "", limit: int = 200, offset: int = 0) -> 
                    AND sl.wa_error NOT LIKE 'skip:%'
                  ORDER BY sl.timestamp DESC LIMIT 1) as wa_error
                FROM daily_reports dr
+               JOIN (SELECT nomor_normalized, MAX(id) AS max_id FROM daily_reports GROUP BY nomor_normalized) latest
+                 ON latest.max_id = dr.id
                LEFT JOIN players p ON p.nomor_normalized = dr.nomor_normalized
                WHERE dr.nama LIKE ? OR dr.nomor_hp LIKE ?
                GROUP BY dr.nomor_normalized
@@ -275,6 +279,8 @@ def get_players_summary(search: str = "", limit: int = 200, offset: int = 0) -> 
             """SELECT
                 dr.nama, dr.email, dr.nomor_hp, dr.nomor_normalized,
                 dr.status_redeem, dr.lencana_gear,
+                dr.milestone, dr.bonus_milestone, dr.status_verifikasi_ai_agent,
+                dr.jumlah_lencana, dr.jumlah_arcade_game,
                 COALESCE(p.wa_available, 0) as wa_available,
                 COALESCE(p.tg_available, 0) as tg_available,
                 p.tg_user_id, COALESCE(p.tg_joined, 0) as tg_joined, p.updated_at as checked_at,
@@ -284,6 +290,8 @@ def get_players_summary(search: str = "", limit: int = 200, offset: int = 0) -> 
                    AND sl.wa_error NOT LIKE 'skip:%'
                  ORDER BY sl.timestamp DESC LIMIT 1) as wa_error
                FROM daily_reports dr
+               JOIN (SELECT nomor_normalized, MAX(id) AS max_id FROM daily_reports GROUP BY nomor_normalized) latest
+                 ON latest.max_id = dr.id
                LEFT JOIN players p ON p.nomor_normalized = dr.nomor_normalized
                GROUP BY dr.nomor_normalized
                ORDER BY dr.nama COLLATE NOCASE
@@ -300,6 +308,8 @@ def get_player_summary_by_phone(nomor_normalized: str) -> dict | None:
         """SELECT
             dr.nama, dr.email, dr.nomor_hp, dr.nomor_normalized,
             dr.status_redeem, dr.lencana_gear,
+            dr.milestone, dr.bonus_milestone, dr.status_verifikasi_ai_agent,
+            dr.jumlah_lencana, dr.jumlah_arcade_game,
             COALESCE(p.wa_available, 0) as wa_available,
             COALESCE(p.tg_available, 0) as tg_available,
             p.tg_user_id, COALESCE(p.tg_joined, 0) as tg_joined, p.updated_at as checked_at,
@@ -309,6 +319,8 @@ def get_player_summary_by_phone(nomor_normalized: str) -> dict | None:
                AND sl.wa_error NOT LIKE 'skip:%'
              ORDER BY sl.timestamp DESC LIMIT 1) as wa_error
            FROM daily_reports dr
+           JOIN (SELECT nomor_normalized, MAX(id) AS max_id FROM daily_reports GROUP BY nomor_normalized) latest
+             ON latest.max_id = dr.id
            LEFT JOIN players p ON p.nomor_normalized = dr.nomor_normalized
            WHERE dr.nomor_normalized = ?
            GROUP BY dr.nomor_normalized""",
@@ -347,7 +359,8 @@ def get_players_unused_numbers() -> list[str]:
         SELECT DISTINCT dr.nomor_normalized
         FROM daily_reports dr
         LEFT JOIN players p ON p.nomor_normalized = dr.nomor_normalized
-        WHERE p.id IS NULL OR p.updated_at IS NULL
+        WHERE (p.id IS NULL OR p.updated_at IS NULL)
+          AND dr.nomor_normalized NOT LIKE 'email:%'
     """).fetchall()
     return [r["nomor_normalized"] for r in rows]
 
@@ -358,7 +371,8 @@ def get_unscanned_players() -> list[dict]:
         SELECT dr.nama, dr.nomor_hp, dr.nomor_normalized
         FROM daily_reports dr
         LEFT JOIN players p ON p.nomor_normalized = dr.nomor_normalized
-        WHERE p.id IS NULL OR p.updated_at IS NULL
+        WHERE (p.id IS NULL OR p.updated_at IS NULL)
+          AND dr.nomor_normalized NOT LIKE 'email:%'
         GROUP BY dr.nomor_normalized
     """).fetchall()
     return dicts_from_rows(rows)
@@ -482,10 +496,14 @@ def import_daily_report(csv_path: str) -> tuple:
 
                 nama = normalize_nama((get_col(row, "nama") or "").strip())
                 hp = (get_col(row, "hp") or "").strip()
+                email = (get_col(row, "email") or "").strip()
                 if not hp:
-                    continue
-
-                normalized = normalize_phone(hp)
+                    # Peserta tanpa nomor HP tetap di-import; kontak dilakukan via email.
+                    if not email:
+                        continue
+                    normalized = "email:" + email.lower()
+                else:
+                    normalized = normalize_phone(hp)
 
                 db.execute(
                     """INSERT INTO daily_reports
@@ -503,7 +521,7 @@ def import_daily_report(csv_path: str) -> tuple:
                            nama_lencana=excluded.nama_lencana, nama_arcade_game=excluded.nama_arcade_game""",
                     (
                         nama,
-                        (get_col(row, "email") or "").strip(),
+                        email,
                         hp,
                         normalized,
                         (get_col(row, "status_redeem") or "").strip(),

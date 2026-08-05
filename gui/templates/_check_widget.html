@@ -1,6 +1,17 @@
 {% set pct = ((progress / (total or 1)) * 100) | int %}
 <div id="check-widget" class="flex flex-col gap-3">
-    {% if error %}
+    {% if status == 'interrupted' %}
+    <div class="status-strip is-error">
+        <span class="status-icon" aria-hidden="true">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        </span>
+        <div>
+            <p class="status-title">Pengecekan terputus</p>
+            <p class="status-detail">Proses berhenti di tengah jalan — {{ progress }}/{{ total }} nomor selesai. Mulai ulang pengecekan?</p>
+            <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm mt-2">Mulai Ulang</button>
+        </div>
+    </div>
+    {% elif error %}
     <div class="status-strip is-error">
         <span class="status-icon" aria-hidden="true">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -36,6 +47,27 @@
         <div class="progress-track" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="{{ total }}" aria-label="Kemajuan pengecekan">
             <div class="progress-fill" style="width:{{ pct }}%;"></div>
         </div>
+        <button hx-post="/check/stop" hx-target="#check-widget" hx-swap="outerHTML"
+                hx-indicator="#stop-spin" hx-disabled-elt="this"
+                class="btn btn-danger btn-sm btn-block">
+            <span class="spinner" id="stop-spin" role="status" aria-label="Menghentikan"></span>
+            Stop Pengecekan
+        </button>
+    </div>
+    {% elif status == 'stopped' %}
+    <div class="flex flex-col gap-3">
+        <div class="status-strip is-warn">
+            <span class="status-icon" aria-hidden="true">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z"/></svg>
+            </span>
+            <div>
+                <p class="status-title">Pengecekan dihentikan</p>
+                <p class="status-detail">{{ progress }}/{{ total }} nomor selesai sebelum dihentikan.</p>
+            </div>
+        </div>
+        <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm btn-block">
+            Cek Nomor Baru
+        </button>
     </div>
     {% elif all_checked %}
     <div class="flex flex-col gap-3">

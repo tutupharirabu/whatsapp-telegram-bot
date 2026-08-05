@@ -31,17 +31,27 @@ API_HASH = os.getenv("TELEGRAM_API_HASH")
 SESSION_NAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "runtime", "checker_session")
 
 
-def check_whatsapp_single(driver, phone: str, delay: float = 3.0) -> bool:
+def check_whatsapp_single(driver, phone: str, delay: float = 2.0) -> bool:
     """
     Cek satu nomor WhatsApp dengan membuka URL send.
     Return True jika nomor terdaftar di WA.
     """
     from bot.whatsapp_bot import detect_invalid_number, wait_for_chat_or_invalid
-    
+
     url = f"https://web.whatsapp.com/send?phone={phone}"
+    # Batasi waktu page load: WA Web /send kadang tidak pernah selesai load
+    # (SPA berat) dan Selenium default menunggu hingga 5 menit per navigasi —
+    # penyebab utama progress terasa "macet".
+    driver.set_page_load_timeout(45)
     driver.get(url)
 
     wait_for_chat_or_invalid(driver, timeout=15)
+
+    # Cek invalid lebih dulu: kalau nomor tidak terdaftar, langsung selesai
+    # tanpa menunggu delay — mempercepat batch secara signifikan.
+    if detect_invalid_number(driver):
+        return False
+
     time.sleep(delay)
 
     return not detect_invalid_number(driver)
@@ -63,17 +73,23 @@ def check_whatsapp_batch(numbers: list[str], progress_cb=None, skip_interactive:
     results: dict[str, bool] = {}
 
     print("  WA: Starting Chrome...")
-    driver = create_wa_driver()
+    try:
+        driver = create_wa_driver()
+    except Exception as e:  # noqa: BLE001 — Chrome gagal start = kegagalan batch, bukan crash worker
+        print(f"  ❌ WA: Gagal start Chrome: {e}")
+        release_wa_profile_lock()
+        return {n: False for n in numbers}
 
     try:
         # Navigasi ke WhatsApp Web dulu
+        driver.set_page_load_timeout(45)
         driver.get("https://web.whatsapp.com")
 
         if not wait_for_wa_ready(driver, timeout=30):
             if skip_interactive:
                 print("  ❌ WhatsApp Web belum login. Skipping (non-interactive mode).")
                 return {n: False for n in numbers}
-            
+
             print("\n  ⚠ WhatsApp Web belum login!")
             print("  Silakan scan QR code lalu tekan Enter...")
             input()
@@ -89,7 +105,7 @@ def check_whatsapp_batch(numbers: list[str], progress_cb=None, skip_interactive:
                 results[phone] = has_wa
                 status = "YES" if has_wa else "NO"
                 print(f"  WA: [{i}/{len(numbers)}] {phone} → {status}")
-            except (WebDriverException, ValueError, OSError) as e:
+            except Exception as e:  # noqa: BLE001 — satu nomor gagal tidak boleh menghentikan batch
                 print(f"  WA: [{i}/{len(numbers)}] {phone} → ERROR: {e}")
                 results[phone] = False
 
@@ -98,10 +114,13 @@ def check_whatsapp_batch(numbers: list[str], progress_cb=None, skip_interactive:
 
             # Jeda antar cek
             if i < len(numbers):
-                time.sleep(1.5)
+                time.sleep(1.0)
 
     finally:
-        driver.quit()
+        try:
+            driver.quit()
+        except (WebDriverException, OSError):
+            pass
         release_wa_profile_lock()
         print("  WA: Browser closed.")
 
@@ -154,7 +173,15 @@ async def check_telegram_batch(numbers_or_players) -> dict[str, bool]:
     client = TelegramClient(SESSION_NAME, int(API_ID), API_HASH)
 
     try:
-        await client.start()  # type: ignore — stub telethon tidak meng-annotate start() sebagai coroutine
+        # JANGAN panggil client.start() tanpa phone di worker: kalau session tidak
+        # valid, Telethon memanggil input() dan menggantung selamanya di proses yang
+        # tidak punya siapa-siapa untuk mengetik — sumber "macet" di fase Telegram.
+        # Di sini: connect + cek autorisasi dulu; kalau belum login, laporkan jelas.
+        await client.connect()
+        if not await client.is_user_authorized():
+            print("  ❌ TG: Session checker belum login. Jalankan login interaktif dulu "
+                  "(python cli/send.py atau buat session checker_session).")
+            return results
         print("  TG: Connected. Synchronizing contacts...")
 
         # Kirim request import

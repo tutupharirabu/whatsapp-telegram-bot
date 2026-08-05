@@ -3,11 +3,17 @@
 {% if needs_redeem and needs_gear %}{% set rtype = 'remind-both' %}
 {% elif needs_redeem %}{% set rtype = 'remind-redeem' %}
 {% elif needs_gear %}{% set rtype = 'remind-gear' %}{% endif %}
-<tr id="row-{{ p.nomor_normalized }}">
-    <td class="font-medium max-w-[200px] truncate">{{ p.nama }}</td>
-    <td class="num hidden sm:table-cell text-dim">{{ p.nomor_hp }}</td>
+{# ID aman untuk CSS selector (key email: berisi karakter khusus) #}
+{% set nid = p.nomor_normalized | replace(':', '_') | replace('@', '_') %}
+<tr id="row-{{ nid }}">
+    <td class="font-medium max-w-[180px] truncate">{{ p.nama }}</td>
+    <td class="max-w-[200px] truncate text-dim" title="{{ p.email or '' }}">{{ p.email or "—" }}</td>
+    <td class="num hidden sm:table-cell text-dim">
+        {% if p.nomor_hp %}{{ p.nomor_hp }}{% else %}<span class="text-faint">Tanpa nomor</span>{% endif %}
+    </td>
     <td class="text-center">
-        {% if p.checked_at %}
+        {% if not p.nomor_hp %}<span class="chip chip-off">Via email</span>
+        {% elif p.checked_at %}
             {% if p.wa_available %}
                 <span class="chip chip-wa"><span class="chip-dot" aria-hidden="true"></span>WA aktif</span>
             {% else %}
@@ -16,7 +22,8 @@
         {% else %}<span class="chip chip-off">Belum dicek</span>{% endif %}
     </td>
     <td class="text-center">
-        {% if p.checked_at %}
+        {% if not p.nomor_hp %}<span class="chip chip-off">Via email</span>
+        {% elif p.checked_at %}
             {% if p.tg_available %}
                 <span class="chip chip-tg"><span class="chip-dot" aria-hidden="true"></span>TG aktif</span>
             {% else %}
@@ -39,27 +46,38 @@
         {% else %}<span class="chip chip-off">—</span>{% endif %}
     </td>
     <td class="text-center">
+        {% if p.status_verifikasi_ai_agent %}
+            <span class="inline-block max-w-[110px] truncate align-middle text-xs text-dim" title="{{ p.status_verifikasi_ai_agent }}">{{ p.status_verifikasi_ai_agent }}</span>
+        {% else %}<span class="chip chip-off">—</span>{% endif %}
+    </td>
+    <td class="text-center text-xs text-faint">{{ p.milestone or "—" }}</td>
+    <td class="text-center num">{{ p.jumlah_lencana if p.jumlah_lencana is not none else "—" }}</td>
+    <td class="text-center num">{{ p.jumlah_arcade_game if p.jumlah_arcade_game is not none else "—" }}</td>
+    <td class="text-center">
         <input type="checkbox" aria-label="Tandai {{ p.nama }} sudah bergabung grup Telegram" {% if p.tg_joined %}checked{% endif %} class="tg-joined-check"
             hx-post="/players/toggle-tg/{{ p.nomor_normalized }}"
-            hx-target="#row-{{ p.nomor_normalized }}"
+            hx-target="#row-{{ nid }}"
             hx-swap="outerHTML">
     </td>
     <td>
         {% if not p.tg_joined or rtype %}
         <div class="row-actions">
+            {% if not p.nomor_hp %}
+            <span class="tag tag-accent">Kontak via email</span>
+            {% endif %}
             {% if not p.tg_joined %}
             <div class="action-row">
-                <label class="sr-only" for="tone-{{ p.nomor_normalized }}">Tone pesan join grup</label>
-                <select id="tone-{{ p.nomor_normalized }}" name="type" class="select"
+                <label class="sr-only" for="tone-{{ nid }}">Tone pesan join grup</label>
+                <select id="tone-{{ nid }}" name="type" class="select"
                     aria-label="Pilih tone pesan join grup"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}"
-                    hx-target="#action-join-{{ p.nomor_normalized }}"
+                    hx-target="#action-join-{{ nid }}"
                     hx-swap="innerHTML"
                     hx-trigger="change">
                     <option value="kasual">Kasual</option>
                     <option value="formal">Formal</option>
                 </select>
-                <span id="action-join-{{ p.nomor_normalized }}"
+                <span id="action-join-{{ nid }}"
                     class="flex-1 min-w-0"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}?type=kasual"
                     hx-trigger="load" hx-swap="innerHTML"></span>
@@ -70,7 +88,7 @@
                 <span class="tag tag-danger">
                     {% if rtype == 'remind-both' %}Redeem + GEAR{% elif rtype == 'remind-redeem' %}Redeem{% else %}GEAR{% endif %}
                 </span>
-                <span id="action-remind-{{ p.nomor_normalized }}"
+                <span id="action-remind-{{ nid }}"
                     class="flex-1 min-w-0"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}?type={{ rtype }}"
                     hx-trigger="load" hx-swap="innerHTML"></span>

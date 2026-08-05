@@ -18,6 +18,10 @@ runtime/
 # Command Code
 .commandcode/
 
+# Tool artifacts (browser MCP console logs, UI work screenshots)
+.playwright-mcp/
+.uiwork/
+
 # Python
 __pycache__/
 *.pyc

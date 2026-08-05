@@ -15,7 +15,7 @@
             <span id="upload-spin-dashboard" class="spinner" role="status" aria-label="Mengunggah"></span>
             <input type="file" name="file" accept=".csv" required
                    aria-labelledby="dz-dashboard-label"
-                   onchange="var l=document.getElementById('dz-dashboard-label'),h=document.getElementById('dz-dashboard-hint'),z=document.getElementById('dz-dashboard'),f=this.files[0];if(f){l.textContent=f.name;h.textContent=(f.size/1024).toFixed(1)+' KB — siap diunggah';z.classList.add('has-file');}else{l.textContent='Upload laporan harian (.csv)';h.textContent='Pilih file untuk memperbarui data peserta';z.classList.remove('has-file');}">
+                   onchange="var l=document.getElementById('dz-dashboard-label'),h=document.getElementById('dz-dashboard-hint'),z=document.getElementById('dz-dashboard'),f=this.files[0];if(f){l.textContent=f.name;h.textContent=(f.size/1024).toFixed(1)+' KB — siap diunggah';z.classList.add('has-file');}else{l.textContent='Upload laporan harian (.csv)';h.textContent='Pilih file untuk memperbarui data peserta';z.classList.remove('has-file');}this.form.requestSubmit();">
         </label>
     </form>
 </div>

@@ -1,14 +1,46 @@
 <div class="table-wrap">
-    <table class="data-table min-w-[920px]">
+    <table class="data-table min-w-[1320px]">
         <thead>
             <tr>
-                <th class="min-w-[180px]">Nama</th>
-                <th class="hidden sm:table-cell">Nomor</th>
-                <th class="text-center">WhatsApp</th>
-                <th class="text-center">Telegram</th>
-                <th class="text-center">Redeem</th>
-                <th class="text-center">GEAR</th>
-                <th class="text-center">Join Grup</th>
+                <th class="min-w-[160px]" title="Nama peserta">Nama</th>
+                <th class="min-w-[180px] max-w-[240px]" title="Email peserta">Email</th>
+                <th class="hidden sm:table-cell" title="Nomor HP peserta">Nomor</th>
+                <th class="text-center" title="Status terdaftar WhatsApp (dari pengecekan nomor)">
+                    <span class="th-label">WA</span>
+                    <span class="th-sub">Terdaftar WhatsApp</span>
+                </th>
+                <th class="text-center" title="Status terdaftar Telegram (dari pengecekan nomor)">
+                    <span class="th-label">TG</span>
+                    <span class="th-sub">Terdaftar Telegram</span>
+                </th>
+                <th class="text-center" title="Status Redeem Kode Akses">
+                    <span class="th-label">Redeem</span>
+                    <span class="th-sub">Kode akses</span>
+                </th>
+                <th class="text-center" title="Lencana Digital GEAR yang diraih">
+                    <span class="th-label">GEAR</span>
+                    <span class="th-sub">Lencana GEAR</span>
+                </th>
+                <th class="text-center" title="Status Verifikasi AI Agent">
+                    <span class="th-label">Verif. AI</span>
+                    <span class="th-sub">Status AI Agent</span>
+                </th>
+                <th class="text-center" title="Milestone yang diraih">
+                    <span class="th-label">Milestone</span>
+                    <span class="th-sub">yang diraih</span>
+                </th>
+                <th class="text-center" title="Jumlah Lencana Keahlian yang diselesaikan">
+                    <span class="th-label">Lencana</span>
+                    <span class="th-sub">jumlah keahlian</span>
+                </th>
+                <th class="text-center" title="Jumlah Arcade Game yang diselesaikan">
+                    <span class="th-label">Arcade</span>
+                    <span class="th-sub">jumlah game</span>
+                </th>
+                <th class="text-center" title="Sudah bergabung grup Telegram">
+                    <span class="th-label">Join Grup</span>
+                    <span class="th-sub">Grup TG</span>
+                </th>
                 <th class="min-w-[280px]">Tindakan</th>
             </tr>
         </thead>
@@ -17,7 +49,7 @@
                 {% include "_player_row.html" %}
             {% else %}
             <tr>
-                <td colspan="8">
+                <td colspan="13">
                     <div class="empty-state">
                         {% if search %}Tidak ada peserta yang cocok dengan “{{ search }}”.{% else %}Belum ada peserta. Upload laporan harian dulu.{% endif %}
                     </div>

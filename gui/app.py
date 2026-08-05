@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 from bot import db
 from bot.whatsapp_bot import send_whatsapp_instant
-from gui.checker_async import get_check_status, start_check_background
+from gui.checker_async import get_check_status, start_check_background, stop_check_background
 
 load_dotenv()
 
@@ -329,16 +329,22 @@ async def start_check(request: Request):
 
 @app.get("/check", response_class=HTMLResponse)
 async def check_page(request: Request):
-    s = get_check_status()
-    return templates.TemplateResponse(request, "check.html", {
-        "is_running": s.get("status") == "running",
+    # Fitur cek nomor difokuskan di dashboard utama; halaman standalone dihapus.
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/check/stop", response_class=HTMLResponse)
+async def stop_check(request: Request):
+    """Hentikan check yang sedang berjalan tanpa menunggu batas waktu stale."""
+    s = stop_check_background()
+    return templates.TemplateResponse(request, "_check_widget.html", {
+        "is_running": False,
         "status": s.get("status", "idle"),
         "progress": s.get("progress", 0),
-        "total": s.get("total", 1),
+        "total": max(s.get("total", 1), 1),
         "phase": s.get("phase", ""),
         "error": s.get("error", ""),
-        "all_checked": len(db.get_players_unused_numbers()) == 0,
     })
+
 
 @app.get("/check/status", response_class=HTMLResponse)
 async def check_status(request: Request):
@@ -544,4 +550,9 @@ async def save_template(request: Request, key: str):
 if __name__ == "__main__":
     import uvicorn
     default_host = "127.0.0.1" if not DASHBOARD_TOKEN else "0.0.0.0"
-    uvicorn.run("gui.app:app", host=os.getenv("HOST", default_host), port=8000, reload=True)
+    # reload=True tidak aman dipakai bersama multiprocessing.Process (worker pengecekan):
+    # reloader men-spawn server, lalu spawn worker di dalamnya → pada macOS/Linux
+    # child worker ikut mengeksekusi ulang uvicorn.run. Default OFF; aktifkan hanya
+    # saat pengembangan via env GUI_RELOAD=1.
+    reload = os.getenv("GUI_RELOAD", "").lower() in ("1", "true", "yes")
+    uvicorn.run("gui.app:app", host=os.getenv("HOST", default_host), port=8000, reload=reload)

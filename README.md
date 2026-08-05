@@ -79,6 +79,9 @@ whatsapp-telegram-bot/
 ### 1. Memulai Dashboard (GUI)
 
 Aplikasi GUI memudahkan pemantauan dan pengiriman manual melalui antarmuka web.
+Jalankan **dari folder project ini** (`python gui/app.py`), jangan dari salinan
+folder lain (mis. `/tmp/...`) — salinan memiliki DB/status/session terpisah dan
+mudah membuat pengecekan tampak macet karena state-nya terbelah.
 
 ```bash
 python gui/app.py
@@ -86,6 +89,9 @@ python gui/app.py
 Akses di browser: `http://localhost:8000`
 
 > **Note:** Pada jalankan pertama kali, buka tab WhatsApp di browser Selenium yang muncul dan scan QR code.
+
+> **Note dev:** auto-reload (`GUI_RELOAD=1`) dimatikan secara default — tidak aman
+> dipakai bersama `multiprocessing.Process` (worker pengecekan).
 
 ### 2. Pengecekan Nomor Massal (CLI)
 
@@ -120,5 +126,6 @@ Data penting (DB, session Telegram, profil WA) disimpan di `runtime/`. Backup ru
 ## Troubleshooting & Tips
 
 - **Session WhatsApp Hilang:** Jika WA terus-menerus minta login QR, pastikan direktori `runtime/wa_chrome_profile/` tidak terhapus dan memiliki permission yang benar. Jangan jalankan GUI dan CLI/checker bersamaan — keduanya berbagi profil yang sama (sudah ada file lock otomatis di `runtime/wa_profile.lock`).
+- **Pengecekan tampak macet ("Memeriksa…" terus):** Worker pengecekan berjalan di proses terpisah (`runtime/check_status.json` berisi `pid` + `pid_started`). Jika prosesnya mati di tengah jalan, widget otomatis menampilkan **"Pengecekan terputus"** dan menawarkan tombol Mulai Ulang — tidak perlu menunggu 30 menit. Jika error, detailnya muncul di widget. Pastikan juga server dijalankan dari folder project (lihat bagian GUI di atas).
 - **`TypeError: unhashable type: 'dict'` di Dashboard:** Ini masalah kompabilitas Jinja2Templates di FastAPI/Starlette terbaru. Pastikan call route di `gui/app.py` menggunakan signature `TemplateResponse(request, "name.html", context)`.
 - **Error CSV DictReader:** Pastikan file export dari Google Sheets format kolomnya konsisten (contoh: tidak ada double quote `"..."` ekstra yang tidak di-*escape*).
