@@ -4,41 +4,54 @@
 {% elif needs_redeem %}{% set rtype = 'remind-redeem' %}
 {% elif needs_gear %}{% set rtype = 'remind-gear' %}{% endif %}
 <tr id="row-{{ p.nomor_normalized }}">
-    <td class="max-w-[160px] sm:max-w-none truncate">{{ p.nama }}</td>
-    <td class="num hidden sm:table-cell">{{ p.nomor_hp }}</td>
+    <td class="font-medium max-w-[200px] truncate">{{ p.nama }}</td>
+    <td class="num hidden sm:table-cell text-dim">{{ p.nomor_hp }}</td>
     <td class="text-center">
         {% if p.checked_at %}
-            {% if p.wa_available %}<span class="dot-go">●</span>{% else %}<span class="dot-bad">✗</span>{% endif %}
-        {% else %}<span class="dot-off">—</span>{% endif %}
+            {% if p.wa_available %}
+                <span class="chip chip-wa"><span class="chip-dot" aria-hidden="true"></span>WA aktif</span>
+            {% else %}
+                <span class="chip chip-bad"><span class="chip-dot" aria-hidden="true"></span>Tidak aktif</span>
+            {% endif %}
+        {% else %}<span class="chip chip-off">Belum dicek</span>{% endif %}
     </td>
     <td class="text-center">
         {% if p.checked_at %}
-            {% if p.tg_available %}<span class="dot-go">●</span>{% else %}<span class="dot-bad">✗</span>{% endif %}
-        {% else %}<span class="dot-off">—</span>{% endif %}
+            {% if p.tg_available %}
+                <span class="chip chip-tg"><span class="chip-dot" aria-hidden="true"></span>TG aktif</span>
+            {% else %}
+                <span class="chip chip-bad"><span class="chip-dot" aria-hidden="true"></span>Tidak aktif</span>
+            {% endif %}
+        {% else %}<span class="chip chip-off">Belum dicek</span>{% endif %}
     </td>
     <td class="text-center">
-        {% if p.status_redeem and p.status_redeem.lower() == 'yes' %}<span class="dot-go">✓</span>
-        {% elif needs_redeem %}<span class="dot-bad font-semibold text-xs">No</span>
-        {% else %}<span class="dot-off">—</span>{% endif %}
+        {% if p.status_redeem and p.status_redeem.lower() == 'yes' %}
+            <span class="chip chip-ok">Sudah</span>
+        {% elif needs_redeem %}
+            <span class="chip chip-warn">Belum</span>
+        {% else %}<span class="chip chip-off">—</span>{% endif %}
     </td>
     <td class="text-center">
-        {% if p.lencana_gear and 'enterprise' in p.lencana_gear.lower() %}<span class="dot-go">✓</span>
-        {% elif needs_gear %}<span class="dot-bad font-semibold text-xs">No</span>
-        {% else %}<span class="dot-off">—</span>{% endif %}
+        {% if p.lencana_gear and 'enterprise' in p.lencana_gear.lower() %}
+            <span class="chip chip-ok">Sudah</span>
+        {% elif needs_gear %}
+            <span class="chip chip-warn">Belum</span>
+        {% else %}<span class="chip chip-off">—</span>{% endif %}
     </td>
     <td class="text-center">
-        <input type="checkbox" aria-label="Tandai {{ p.nama }}" {% if p.tg_joined %}checked{% endif %} class="tg-joined-check"
+        <input type="checkbox" aria-label="Tandai {{ p.nama }} sudah bergabung grup Telegram" {% if p.tg_joined %}checked{% endif %} class="tg-joined-check"
             hx-post="/players/toggle-tg/{{ p.nomor_normalized }}"
             hx-target="#row-{{ p.nomor_normalized }}"
             hx-swap="outerHTML">
     </td>
-    <td class="text-xs" style="min-width:320px;">
+    <td>
         {% if not p.tg_joined or rtype %}
-        <div class="flex flex-col gap-1.5">
+        <div class="row-actions">
             {% if not p.tg_joined %}
             <div class="action-row">
-                <span class="tag text-iris">Join Grup</span>
-                <select name="type" class="action-select" aria-label="Pilih tone pesan join grup"
+                <label class="sr-only" for="tone-{{ p.nomor_normalized }}">Tone pesan join grup</label>
+                <select id="tone-{{ p.nomor_normalized }}" name="type" class="select"
+                    aria-label="Pilih tone pesan join grup"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}"
                     hx-target="#action-join-{{ p.nomor_normalized }}"
                     hx-swap="innerHTML"
@@ -47,22 +60,23 @@
                     <option value="formal">Formal</option>
                 </select>
                 <span id="action-join-{{ p.nomor_normalized }}"
+                    class="flex-1 min-w-0"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}?type=kasual"
                     hx-trigger="load" hx-swap="innerHTML"></span>
             </div>
             {% endif %}
             {% if rtype %}
             <div class="action-row">
-                <span class="tag text-danger">
+                <span class="tag tag-danger">
                     {% if rtype == 'remind-both' %}Redeem + GEAR{% elif rtype == 'remind-redeem' %}Redeem{% else %}GEAR{% endif %}
                 </span>
-                <!-- remind tidak punya pilihan template (tone ditentukan status peserta), jadi preview dimuat sekali saat render agar tombol kirim tetap tersedia -->
                 <span id="action-remind-{{ p.nomor_normalized }}"
+                    class="flex-1 min-w-0"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}?type={{ rtype }}"
                     hx-trigger="load" hx-swap="innerHTML"></span>
             </div>
             {% endif %}
         </div>
-        {% else %}<span class="dot-off">—</span>{% endif %}
+        {% else %}<span class="text-faint text-sm">Selesai</span>{% endif %}
     </td>
 </tr>

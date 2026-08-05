@@ -5,23 +5,23 @@
     'remind-gear': 'Pengingat badge GEAR',
     'remind-both': 'Pengingat redeem + GEAR',
 } %}
-<div class="panel panel-hover" id="card-{{ key }}">
-    <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
-        <div>
-            <span class="tag text-iris">{{ key }}</span>
-            <span class="text-sm ml-2 text-dim">{{ descriptions.get(key, '') }}</span>
+<div class="panel" id="card-{{ key }}">
+    <div class="panel-head">
+        <div class="flex items-center gap-3">
+            <span class="tag tag-accent">{{ key }}</span>
+            <span class="text-sm text-dim">{{ descriptions.get(key, '') }}</span>
         </div>
     </div>
     <form hx-post="/templates/save/{{ key }}"
           hx-target="#card-{{ key }}"
           hx-swap="outerHTML"
           hx-indicator="#save-spin-{{ key }}"
-          class="px-5 py-4">
-        <textarea name="content"
-            class="field w-full text-sm font-sans leading-relaxed min-h-[120px] resize-y">{{ tpl }}</textarea>
+          class="panel-body">
+        <textarea name="content" aria-label="Isi template {{ key }}"
+            class="field w-full font-mono text-sm leading-relaxed min-h-[110px] resize-y">{{ tpl }}</textarea>
         <div class="flex items-center gap-3 mt-3">
             <button type="submit" class="btn btn-primary btn-sm" hx-disabled-elt="this">Simpan</button>
-            <span id="save-spin-{{ key }}" class="spinner"></span>
+            <span id="save-spin-{{ key }}" class="spinner" role="status" aria-label="Menyimpan"></span>
         </div>
     </form>
 </div>

@@ -1,20 +1,21 @@
-<div id="dashboard-stats" 
-     class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+<div id="dashboard-stats"
+     class="stat-strip"
      hx-get="/api/dashboard-stats"
      hx-trigger="update-dashboard from:body"
      hx-swap="outerHTML">
-    <div class="panel panel-hover p-5">
-        <p class="text-sm font-medium mb-1 text-dim">Total Peserta Import</p>
-        <p class="text-3xl font-bold">{{ stats.total_players }}</p>
+    <div class="stat">
+        <p class="stat-value">{{ stats.total_players }}</p>
+        <p class="stat-label">Total peserta</p>
+        <p class="stat-hint">Dari laporan harian</p>
     </div>
-    <div class="panel panel-hover p-5">
-        <p class="text-sm font-medium mb-1 text-dim">WA Aktif</p>
-        <p class="text-3xl font-bold text-wa">{{ stats.wa_registered }}</p>
-        <p class="text-xs mt-1 text-dim">Terdaftar WA</p>
+    <div class="stat">
+        <p class="stat-value text-wa">{{ stats.wa_registered }}</p>
+        <p class="stat-label">Terdaftar WhatsApp</p>
+        <p class="stat-hint">{% if stats.unscanned_count %}{{ stats.unscanned_count }} nomor belum dicek{% else %}Semua nomor sudah dicek{% endif %}</p>
     </div>
-    <div class="panel panel-hover p-5">
-        <p class="text-sm font-medium mb-1 text-dim">TG Aktif / Join</p>
-        <p class="text-3xl font-bold text-tg">{{ stats.tg_registered }} / {{ stats.tg_joined_count }}</p>
-        <p class="text-xs mt-1 text-dim">Terdaftar TG / Masuk Grup</p>
+    <div class="stat">
+        <p class="stat-value text-tg">{{ stats.tg_registered }}</p>
+        <p class="stat-label">Terdaftar Telegram</p>
+        <p class="stat-hint">{{ stats.tg_joined_count }} sudah bergabung grup</p>
     </div>
 </div>

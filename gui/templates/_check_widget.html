@@ -1,43 +1,61 @@
 {% set pct = ((progress / (total or 1)) * 100) | int %}
-<div id="check-widget" class="flex flex-col gap-2">
+<div id="check-widget" class="flex flex-col gap-3">
     {% if error %}
-    <div class="panel p-4 border-danger">
-        <p class="text-sm font-semibold mb-1 text-danger">Gagal</p>
-        <p class="text-xs text-dim">{{ error }}</p>
-        <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-ghost btn-sm mt-2">Coba Lagi</button>
+    <div class="status-strip is-error">
+        <span class="status-icon" aria-hidden="true">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </span>
+        <div>
+            <p class="status-title">Pengecekan gagal</p>
+            <p class="status-detail">{{ error }}</p>
+            <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-ghost btn-sm mt-2">Coba Lagi</button>
+        </div>
     </div>
     {% elif status == 'stale' %}
-    <div class="panel p-4 border-danger">
-        <p class="text-sm font-semibold mb-1 text-danger">Pengecekan macet</p>
-        <p class="text-xs text-dim">Proses terakhir tidak selesai dalam 30 menit. Mulai ulang pengecekan?</p>
-        <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm mt-2">Mulai Pengecekan</button>
+    <div class="status-strip is-error">
+        <span class="status-icon" aria-hidden="true">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        </span>
+        <div>
+            <p class="status-title">Pengecekan macet</p>
+            <p class="status-detail">Proses terakhir tidak selesai dalam 30 menit. Mulai ulang pengecekan?</p>
+            <button hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm mt-2">Mulai Pengecekan</button>
+        </div>
     </div>
     {% elif is_running %}
-    <div hx-get="/check/status" hx-trigger="every 2s" hx-swap="outerHTML">
-        <button disabled class="btn btn-ghost btn-sm w-full opacity-70 cursor-not-allowed">
-            <svg class="w-4 h-4 mr-2 inline animate-spin align-[-3px]" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
-                <path d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z" fill="currentColor" opacity="0.75"/>
-            </svg>
-            {% if phase == 'whatsapp' %}Memeriksa WhatsApp…
-            {% elif phase == 'telegram' %}Memeriksa Telegram…
-            {% else %}Sedang memeriksa…{% endif %}
-        </button>
-        <div class="progress-track">
+    <div hx-get="/check/status" hx-trigger="every 2s" hx-swap="outerHTML" class="flex flex-col gap-2">
+        <div class="phase-label">
+            <span class="inline-flex items-center gap-2 text-sm font-medium">
+                <span class="spinner" role="status" aria-label="Memeriksa"></span>
+                {% if phase == 'whatsapp' %}Memeriksa WhatsApp…
+                {% elif phase == 'telegram' %}Memeriksa Telegram…
+                {% else %}Sedang memeriksa…{% endif %}
+            </span>
+            <span class="text-xs text-faint num">{{ progress }}/{{ total }} selesai</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="{{ total }}" aria-label="Kemajuan pengecekan">
             <div class="progress-fill" style="width:{{ pct }}%;"></div>
         </div>
-        <p class="text-xs" style="color: var(--warn);">⟳ {{ progress }}/{{ total }} selesai</p>
     </div>
-    {% elif status == 'done' %}
-    <div class="flex flex-col gap-2" hx-get="/check/status" hx-trigger="every 5s" hx-swap="outerHTML">
-        <p class="text-xs text-wa">✓ Pemeriksaan selesai — {{ progress }} dari {{ total }} nomor.</p>
-        <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm w-full">
-            Cek Semua Peserta
+    {% elif all_checked %}
+    <div class="flex flex-col gap-3">
+        <div class="status-strip is-success">
+            <span class="status-icon" aria-hidden="true">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </span>
+            <div>
+                <p class="status-title">Semua nomor sudah dicek</p>
+                {% if progress %}<p class="status-detail">{{ progress }} peserta terverifikasi.</p>{% endif %}
+                {% if notice %}<p class="status-detail">{{ notice }}</p>{% endif %}
+            </div>
+        </div>
+        <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm btn-block">
+            Cek Nomor Baru
         </button>
     </div>
     {% else %}
-    <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm w-full">
-        Cek Semua Peserta
+    <button id="check-btn" hx-post="/check" hx-target="#check-widget" hx-swap="outerHTML" hx-disabled-elt="this" class="btn btn-primary btn-sm btn-block">
+        Cek Nomor Baru
     </button>
     {% endif %}
 </div>

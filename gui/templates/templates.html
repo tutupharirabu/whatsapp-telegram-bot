@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 
-<header class="mb-8">
-    <p class="eyebrow mb-1">Messaging</p>
-    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Template Pesan</h1>
-    <p class="text-sm text-dim">Sunting template pesan yang dikirim ke peserta. Placeholder <code class="px-1 rounded text-xs font-mono" style="background: var(--panel-2);">{nama} {nama_fasil} {kode_fasil}</code> akan diganti otomatis.</p>
+<header class="page-head">
+    <h1 class="page-title">Template Pesan</h1>
+    <p class="page-desc">
+        Pesan yang dikirim ke peserta. Placeholder
+        <code class="px-1.5 py-0.5 rounded text-xs font-mono text-accent" style="background: var(--bg-elev-2);">{nama} {nama_fasil} {kode_fasil}</code>
+        diganti otomatis saat pengiriman.
+    </p>
 </header>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-4">
     {% for key, tpl in templates.items() %}
         {% include "_template_card.html" %}
     {% endfor %}

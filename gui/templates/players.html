@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block main_width %}max-w-[1400px]{% endblock %}
+{% block main_width %}max-w-[1440px]{% endblock %}
 {% block content %}
 
-<header class="mb-5">
-    <p class="eyebrow mb-1">Roster</p>
-    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Daftar Peserta</h1>
-    <p class="text-sm text-dim">Semua peserta dari laporan harian. Status WA &amp; Telegram di-update tiap check.</p>
+<header class="page-head">
+    <h1 class="page-title">Peserta</h1>
+    <p class="page-desc">Daftar peserta dari laporan harian. Status WA &amp; Telegram diperbarui setiap pengecekan; kirim undangan atau pengingat langsung dari sini.</p>
 </header>
 
-<div class="mb-4">
-    <form hx-get="/players" hx-target="#player-table" hx-swap="innerHTML" hx-trigger="input delay:300ms from:input[name=search], submit">
+<div class="mb-4 flex items-center gap-3 flex-wrap">
+    <form hx-get="/players" hx-target="#player-table" hx-swap="innerHTML" hx-trigger="input delay:300ms from:input[name=search], submit" class="min-w-0 flex-1 max-w-md">
         <input type="search" name="search" placeholder="Cari nama atau nomor…" value="{{ search }}"
-            class="field sm:w-80" autocomplete="off">
+            class="field w-full" autocomplete="off" aria-label="Cari peserta">
     </form>
+    <p class="text-sm text-faint num">{{ total }} peserta</p>
 </div>
 
 <div id="player-table">

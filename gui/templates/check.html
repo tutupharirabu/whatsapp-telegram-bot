@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 
-<header class="mb-8">
-    <p class="eyebrow mb-1">Tools</p>
-    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Cek Nomor Peserta</h1>
-    <p class="text-sm" style="color: var(--fg-dim);">Pemeriksaan status WhatsApp dan Telegram aktif pada nomor peserta baru.</p>
+<header class="page-head">
+    <h1 class="page-title">Cek Nomor Peserta</h1>
+    <p class="page-desc">Periksa status WhatsApp dan Telegram pada nomor peserta yang belum pernah dicek.</p>
 </header>
 
-<div class="panel max-w-lg p-6">
-    <div class="mb-4 text-sm" style="color: var(--fg-dim);">
-        Proses ini membutuhkan browser Selenium untuk berjalan (WhatsApp) dan library Telethon (Telegram). Pastikan bot tidak sedang melakukan pengiriman massal saat pemeriksaan berjalan.
+<div class="panel max-w-2xl">
+    <div class="panel-body">
+        <p class="text-sm text-dim mb-4">
+            Proses ini membutuhkan browser Selenium (WhatsApp) dan library Telethon (Telegram).
+            Pastikan bot tidak sedang melakukan pengiriman massal saat pemeriksaan berjalan.
+        </p>
+        {% include "_check_widget.html" %}
     </div>
-    
-    {% include "_check_widget.html" %}
 </div>
 
 {% endblock %}

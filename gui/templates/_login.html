@@ -7,19 +7,30 @@
     <title>GCAF Auto Messenger — Masuk</title>
     <script src="/static/vendor/tailwindcss.js"></script>
     <script src="/static/vendor/htmx.js"></script>
-    <link rel="stylesheet" href="/static/tokens.css">
+    <link rel="stylesheet" href="/static/tokens.css?v=2">
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
-    <div class="panel p-8 w-full max-w-sm">
-        <p class="eyebrow mb-1">Restricted</p>
-        <h1 class="text-2xl font-bold mb-1">Masuk Dashboard</h1>
-        <p class="text-sm text-dim mb-6">Masukkan token akses untuk melanjutkan.</p>
-        <form method="post" action="/login" class="flex flex-col gap-4">
-            <input type="password" name="token" class="field w-full" placeholder="Token akses"
-                   autocomplete="current-password" required autofocus aria-label="Token akses">
-            {% if error %}<p class="text-xs text-danger">{{ error }}</p>{% endif %}
-            <button type="submit" class="btn btn-primary w-full">Masuk</button>
-        </form>
+<body class="min-h-screen flex items-center justify-center p-6" style="background: radial-gradient(60rem 30rem at 50% -10%, rgba(99,102,241,0.08), transparent), var(--bg);">
+    <div class="w-full max-w-sm">
+        <div class="flex items-center gap-3 mb-6 justify-center">
+            <span class="brand-mark" aria-hidden="true">G</span>
+            <div>
+                <p class="brand-title">GCAF 2026</p>
+                <p class="brand-sub">Auto Messenger</p>
+            </div>
+        </div>
+        <div class="panel p-7">
+            <h1 class="text-xl font-bold mb-1">Masuk Dashboard</h1>
+            <p class="text-sm text-dim mb-6">Masukkan token akses untuk melanjutkan.</p>
+            <form method="post" action="/login" class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label for="login-token" class="text-sm font-medium">Token akses</label>
+                    <input id="login-token" type="password" name="token" class="field w-full" placeholder="Token akses"
+                           autocomplete="current-password" required autofocus>
+                </div>
+                {% if error %}<p class="text-sm text-danger" role="alert">{{ error }}</p>{% endif %}
+                <button type="submit" class="btn btn-primary btn-block">Masuk</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

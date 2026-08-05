@@ -1,28 +1,31 @@
-<div id="dashboard-upload" class="panel p-4 mb-6" style="border-left: 4px solid var(--{% if state == 'success' %}wa-green{% elif state == 'empty' %}warn{% else %}danger{% endif %});" role="status" aria-live="polite">
-    <div class="flex items-center gap-3">
-        {% if state == 'success' %}
-            <svg class="w-5 h-5 flex-shrink-0" style="color: var(--wa-green);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span class="text-sm">✓ {{ imported }} peserta diimpor{% if skipped %}, {{ skipped }} baris dilewati (format tidak sesuai){% endif %}.</span>
-        {% elif state == 'empty' %}
-            <svg class="w-5 h-5 flex-shrink-0" style="color: var(--warn);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-            </svg>
-            <span class="text-sm">Tidak ada data yang bisa diimpor.</span>
-        {% else %}
-            <svg class="w-5 h-5 flex-shrink-0" style="color: var(--danger);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            <span class="text-sm">Gagal memproses file.</span>
-        {% endif %}
+<div id="dashboard-upload" class="mb-6" role="status" aria-live="polite">
+    <div class="status-strip is-{% if state == 'success' %}success{% elif state == 'empty' %}warn{% else %}error{% endif %}">
+        <span class="status-icon" aria-hidden="true">
+            {% if state == 'success' %}
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            {% elif state == 'empty' %}
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            {% else %}
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            {% endif %}
+        </span>
+        <div>
+            <p class="status-title">
+                {% if state == 'success' %}Upload berhasil{% elif state == 'empty' %}Tidak ada data yang bisa diimpor{% else %}Gagal memproses file{% endif %}
+            </p>
+            <p class="status-detail">
+                {% if state == 'success' %}{{ imported }} peserta diimpor{% if skipped %}, {{ skipped }} baris dilewati (format tidak sesuai){% endif %}.{% elif state == 'empty' %}Pastikan file berisi kolom nama dan nomor HP peserta, lalu coba lagi.{% else %}File tidak terbaca sebagai CSV yang valid. Periksa formatnya lalu unggah kembali.{% endif %}
+            </p>
+        </div>
     </div>
+    {% if state == 'success' %}
     <script>
-        {% if state == 'success' %}
         htmx.trigger('body', 'update-dashboard');
-        {% endif %}
+    </script>
+    {% endif %}
+    <script>
         setTimeout(function() {
             htmx.ajax('GET', '/api/dashboard-upload', {target: '#dashboard-upload', swap: 'outerHTML'});
-        }, 3000);
+        }, 4000);
     </script>
 </div>

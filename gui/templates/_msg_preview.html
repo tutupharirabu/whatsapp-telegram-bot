@@ -1,26 +1,31 @@
-<div class="flex flex-col gap-1.5">
-    {% if type == 'remind-both' %}<span class="tag text-danger mb-0.5">Redeem + GEAR</span>{% endif %}
-    <div class="text-xs leading-relaxed overflow-hidden max-h-[120px] text-dim">"{{ msg_wa[:200] }}{% if msg_wa|length > 200 %}…{% endif %}"</div>
-    <div class="flex gap-2 mt-1 items-center">
+<div class="flex flex-col gap-2">
+    <div class="msg-quote" role="note" aria-label="Pratinjau pesan">
+        <p>"{{ msg_wa[:200] }}{% if msg_wa|length > 200 %}…{% endif %}"</p>
+    </div>
+    <div class="flex gap-2 items-center flex-wrap">
         {% if player.wa_available %}
-        <button class="btn btn-ghost btn-sm py-1 text-wa"
+        <button class="btn btn-wa btn-sm"
             hx-post="/api/send-wa/{{ player.nomor_normalized }}?type={{ type }}"
             hx-target="#send-result-{{ player.nomor_normalized }}"
             hx-swap="innerHTML"
             hx-indicator="#send-spin-{{ player.nomor_normalized }}"
             hx-disabled-elt="this">
-            💬 WA</button>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+            Kirim WA
+        </button>
         {% endif %}
         {% if player.tg_available and player.tg_user_id %}
-        <button class="btn btn-ghost btn-sm py-1 text-tg"
+        <button class="btn btn-tg btn-sm"
             hx-post="/api/send-tg/{{ player.nomor_normalized }}?type={{ type }}"
             hx-target="#send-result-{{ player.nomor_normalized }}"
             hx-swap="innerHTML"
             hx-indicator="#send-spin-{{ player.nomor_normalized }}"
             hx-disabled-elt="this">
-            📨 TG</button>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+            Kirim TG
+        </button>
         {% endif %}
-        <span id="send-spin-{{ player.nomor_normalized }}" class="spinner"></span>
-        <span id="send-result-{{ player.nomor_normalized }}" class="text-xs text-dim"></span>
+        <span id="send-spin-{{ player.nomor_normalized }}" class="spinner" role="status" aria-label="Mengirim"></span>
+        <span id="send-result-{{ player.nomor_normalized }}" class="send-status"></span>
     </div>
 </div>

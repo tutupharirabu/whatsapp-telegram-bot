@@ -1,41 +1,45 @@
-<p class="eyebrow mb-3">{{ total }} peserta · dari laporan</p>
-
-<div class="panel overflow-x-auto -mx-3 sm:mx-0 p-0">
-    <table class="data-table min-w-[960px]">
+<div class="table-wrap">
+    <table class="data-table min-w-[920px]">
         <thead>
             <tr>
-                <th class="min-w-[160px]">Nama</th>
+                <th class="min-w-[180px]">Nama</th>
                 <th class="hidden sm:table-cell">Nomor</th>
-                <th class="text-center w-14">WA</th>
-                <th class="text-center w-14">TG</th>
-                <th class="text-center w-20">Redeem</th>
-                <th class="text-center w-20">GEAR</th>
-                <th class="text-center w-24">TG Joined</th>
-                <th class="min-w-[280px]">Actions</th>
+                <th class="text-center">WhatsApp</th>
+                <th class="text-center">Telegram</th>
+                <th class="text-center">Redeem</th>
+                <th class="text-center">GEAR</th>
+                <th class="text-center">Join Grup</th>
+                <th class="min-w-[280px]">Tindakan</th>
             </tr>
         </thead>
         <tbody>
             {% for p in players %}
                 {% include "_player_row.html" %}
             {% else %}
-            <tr><td colspan="8" class="empty-state">Belum ada peserta. Upload laporan harian dulu.</td></tr>
+            <tr>
+                <td colspan="8">
+                    <div class="empty-state">
+                        {% if search %}Tidak ada peserta yang cocok dengan “{{ search }}”.{% else %}Belum ada peserta. Upload laporan harian dulu.{% endif %}
+                    </div>
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
 {% if has_prev or has_next %}
-<div class="flex items-center justify-between gap-3 mt-4 px-1">
+<div class="pager">
     {% if has_prev %}
     <button class="btn btn-ghost btn-sm" hx-get="/players?search={{ search|urlencode }}&amp;offset={{ offset - limit }}" hx-target="#player-table" hx-swap="innerHTML">← Sebelumnya</button>
     {% else %}
-    <button class="btn btn-ghost btn-sm opacity-40 cursor-not-allowed" disabled>← Sebelumnya</button>
+    <button class="btn btn-ghost btn-sm" disabled>← Sebelumnya</button>
     {% endif %}
-    <span class="text-xs text-dim">Hal {{ (offset // limit) + 1 }} · {{ offset + 1 }}–{{ [offset + limit, total]|min }} dari {{ total }}</span>
+    <span class="pager-info">Hal {{ (offset // limit) + 1 }} · {{ offset + 1 }}–{{ [offset + limit, total]|min }} dari {{ total }}</span>
     {% if has_next %}
     <button class="btn btn-ghost btn-sm" hx-get="/players?search={{ search|urlencode }}&amp;offset={{ offset + limit }}" hx-target="#player-table" hx-swap="innerHTML">Berikutnya →</button>
     {% else %}
-    <button class="btn btn-ghost btn-sm opacity-40 cursor-not-allowed" disabled>Berikutnya →</button>
+    <button class="btn btn-ghost btn-sm" disabled>Berikutnya →</button>
     {% endif %}
 </div>
 {% endif %}

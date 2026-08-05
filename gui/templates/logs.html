@@ -2,13 +2,13 @@
 {% block main_width %}max-w-[1200px]{% endblock %}
 {% block content %}
 
-<header class="mb-8">
-    <p class="eyebrow mb-1">History</p>
-    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Riwayat Pengiriman</h1>
+<header class="page-head">
+    <h1 class="page-title">Riwayat Pengiriman</h1>
+    <p class="page-desc">Semua pesan yang dikirim ke peserta, terbaru di atas.</p>
 </header>
 
-<div class="panel overflow-x-auto">
-    <table class="w-full text-left min-w-[720px]">
+<div class="table-wrap">
+    <table class="data-table min-w-[720px]">
         <thead>
             <tr>
                 <th>Waktu</th>
@@ -21,8 +21,8 @@
         <tbody>
             {% for log in logs %}
             <tr>
-                <td class="whitespace-nowrap text-dim">{{ log.timestamp | truncate(19, True, '') }}</td>
-                <td class="font-medium">{{ log.nomor_hp }}</td>
+                <td class="whitespace-nowrap text-dim num">{{ log.timestamp | truncate(19, True, '') }}</td>
+                <td class="font-medium num">{{ log.nomor_hp }}</td>
                 <td>
                     {% if log.platform == 'wa' %}
                         <span class="badge badge-wa">WhatsApp</span>
@@ -33,15 +33,15 @@
                 <td class="truncate max-w-[300px] text-dim">{{ log.msg_preview }}</td>
                 <td>
                     {% if log.status == 'SUCCESS' %}
-                        <span class="text-wa text-xs font-bold">✓ SUCCESS</span>
+                        <span class="badge badge-success">✓ Terkirim</span>
                     {% else %}
-                        <span class="text-danger text-xs font-bold">✗ FAILED</span>
+                        <span class="badge badge-error">✗ Gagal</span>
                     {% endif %}
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" class="p-0">
+                <td colspan="5">
                     <div class="empty-state">Belum ada riwayat pengiriman.</div>
                 </td>
             </tr>
@@ -51,17 +51,17 @@
 </div>
 
 {% if has_prev or has_next %}
-<div class="flex items-center justify-between gap-3 mt-4">
+<div class="pager">
     {% if has_prev %}
     <a href="/logs?offset={{ offset - limit }}" class="btn btn-ghost btn-sm">← Sebelumnya</a>
     {% else %}
-    <span class="btn btn-ghost btn-sm opacity-40 cursor-not-allowed">← Sebelumnya</span>
+    <span class="btn btn-ghost btn-sm" disabled>← Sebelumnya</span>
     {% endif %}
-    <span class="text-xs text-dim">Hal {{ (offset // limit) + 1 }} · {{ offset + 1 }}–{{ [offset + limit, total] | min }} dari {{ total }}</span>
+    <span class="pager-info">Hal {{ (offset // limit) + 1 }} · {{ offset + 1 }}–{{ [offset + limit, total] | min }} dari {{ total }}</span>
     {% if has_next %}
     <a href="/logs?offset={{ offset + limit }}" class="btn btn-ghost btn-sm">Berikutnya →</a>
     {% else %}
-    <span class="btn btn-ghost btn-sm opacity-40 cursor-not-allowed">Berikutnya →</span>
+    <span class="btn btn-ghost btn-sm" disabled>Berikutnya →</span>
     {% endif %}
 </div>
 {% endif %}

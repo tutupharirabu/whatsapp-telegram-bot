@@ -1,29 +1,37 @@
-<div id="dashboard-logs" 
-     class="panel p-5"
-     hx-get="/api/dashboard-logs"
-     hx-trigger="update-dashboard from:body"
-     hx-swap="outerHTML">
-    <h2 class="text-lg font-semibold mb-4">Riwayat Terbaru</h2>
-    {% if logs %}
-        <div class="flex flex-col gap-3">
-            {% for log in logs %}
-            <div class="flex items-center justify-between text-sm pb-3 border-b border-[var(--border)] last:border-0 last:pb-0">
-                <div>
-                    <p class="font-medium">{{ log.platform | upper }} <span class="text-xs ml-1 text-dim">ke</span> {{ log.nomor_hp }}</p>
-                    <p class="text-xs mt-0.5 truncate max-w-[200px] text-dim">{{ log.msg_preview }}</p>
-                </div>
-                <div>
+<section id="dashboard-logs"
+         class="panel"
+         aria-labelledby="logs-panel-title"
+         hx-get="/api/dashboard-logs"
+         hx-trigger="update-dashboard from:body"
+         hx-swap="outerHTML">
+    <div class="panel-head">
+        <h2 id="logs-panel-title" class="panel-title">Riwayat Terbaru</h2>
+        {% if logs %}<a href="/logs" class="text-xs font-semibold text-accent hover:underline">Lihat semua</a>{% endif %}
+    </div>
+    <div class="panel-body">
+        {% if logs %}
+            <div class="flex flex-col">
+                {% for log in logs %}
+                <div class="log-row">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="log-platform {{ 'wa' if log.platform == 'wa' else 'tg' }}" aria-hidden="true">
+                            {{ 'WA' if log.platform == 'wa' else 'TG' }}
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium">{{ log.nomor_hp }}</p>
+                            <p class="text-xs mt-0.5 truncate max-w-[220px] text-faint">{{ log.msg_preview }}</p>
+                        </div>
+                    </div>
                     {% if log.status == 'SUCCESS' %}
                         <span class="badge badge-success">Terkirim</span>
                     {% else %}
                         <span class="badge badge-error">Gagal</span>
                     {% endif %}
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        <a href="/logs" class="text-xs font-medium mt-4 inline-block hover:underline text-iris">Lihat semua &rarr;</a>
-    {% else %}
-        <div class="empty-state">Belum ada riwayat pengiriman.</div>
-    {% endif %}
-</div>
+        {% else %}
+            <div class="empty-state">Belum ada riwayat pengiriman.</div>
+        {% endif %}
+    </div>
+</section>

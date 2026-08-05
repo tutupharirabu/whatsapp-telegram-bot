@@ -1,42 +1,35 @@
-<div class="result-panel result-{{ state }}" role="status" aria-live="polite">
+<div class="status-strip is-{{ state }}" role="status" aria-live="polite">
     {% if state == 'success' %}
-        <div class="result-icon result-icon-success">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-            </svg>
-        </div>
-        <div class="result-body">
-            <p class="result-title">File berhasil diunggah</p>
-            <p class="result-detail">
+        <span class="status-icon" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </span>
+        <div class="text-left">
+            <p class="status-title">File berhasil diunggah</p>
+            <p class="status-detail">
                 {{ imported }} peserta diimpor{% if skipped %}, {{ skipped }} baris dilewati (format tidak sesuai){% endif %}.
             </p>
-            <a href="/" class="result-link">Lanjut ke Dashboard sekarang &rarr;</a>
+            <a href="/" class="status-link">Lanjut ke Dashboard sekarang &rarr;</a>
         </div>
         <script>
-            /* Real cross-document navigation (not an htmx body-swap) so the browser's
-               native View Transition (see meta[name=view-transition] + tokens.css) runs,
-               and so <head> scripts on the dashboard actually execute. */
+            /* Real cross-document navigation (bukan htmx body-swap) agar View Transition
+               native berjalan dan script pada dashboard benar-benar dieksekusi. */
             setTimeout(function () { window.location.assign('/'); }, 2400);
         </script>
     {% elif state == 'empty' %}
-        <div class="result-icon result-icon-warn">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-            </svg>
-        </div>
-        <div class="result-body">
-            <p class="result-title">Tidak ada data yang bisa diimpor</p>
-            <p class="result-detail">Pastikan file berisi kolom <strong>Nama Peserta</strong> dan <strong>Nomor HP Peserta</strong>, lalu coba lagi.</p>
+        <span class="status-icon" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        </span>
+        <div class="text-left">
+            <p class="status-title">Tidak ada data yang bisa diimpor</p>
+            <p class="status-detail">Pastikan file berisi kolom <strong>Nama Peserta</strong> dan <strong>Nomor HP Peserta</strong>, lalu coba lagi.</p>
         </div>
     {% else %}
-        <div class="result-icon result-icon-error">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </div>
-        <div class="result-body">
-            <p class="result-title">Gagal memproses file</p>
-            <p class="result-detail">File tidak terbaca sebagai CSV yang valid. Periksa formatnya lalu coba unggah kembali.</p>
+        <span class="status-icon" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </span>
+        <div class="text-left">
+            <p class="status-title">Gagal memproses file</p>
+            <p class="status-detail">File tidak terbaca sebagai CSV yang valid. Periksa formatnya lalu coba unggah kembali.</p>
         </div>
     {% endif %}
 </div>

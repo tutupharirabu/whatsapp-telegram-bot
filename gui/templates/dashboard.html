@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 
-<header class="mb-8">
-    <p class="eyebrow mb-1">Overview</p>
-    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Dashboard</h1>
+<header class="page-head">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-desc">Ringkasan peserta, upload laporan harian, dan status pengecekan terbaru.</p>
 </header>
 
 {% include "_dashboard_stats.html" %}
 
 {% include "_dashboard_upload.html" %}
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="panel p-5">
-        <h2 class="text-lg font-semibold mb-4">Pengecekan Status</h2>
-        <p class="text-sm mb-4 text-dim">Lakukan pengecekan ketersediaan WA dan Telegram untuk peserta baru.</p>
-        {% include "_check_widget.html" %}
-    </div>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+    <section class="panel" aria-labelledby="check-panel-title">
+        <div class="panel-head">
+            <h2 id="check-panel-title" class="panel-title">Pengecekan Status</h2>
+            <span class="text-xs text-faint">WhatsApp &amp; Telegram</span>
+        </div>
+        <div class="panel-body">
+            {% include "_check_widget.html" %}
+        </div>
+    </section>
 
     {% include "_dashboard_logs.html" %}
 </div>

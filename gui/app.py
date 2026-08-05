@@ -224,6 +224,7 @@ async def dashboard(request: Request):
         "total": s.get("total", 1),
         "phase": s.get("phase", ""),
         "error": s.get("error", ""),
+        "all_checked": stats.get("unscanned_count", 0) == 0,
     })
 
 @app.get("/api/dashboard-upload", response_class=HTMLResponse)
@@ -308,11 +309,22 @@ async def start_check(request: Request):
     unscanned = db.get_players_unused_numbers()
     if unscanned:
         start_check_background()
+        return templates.TemplateResponse(request, "_check_widget.html", {
+            "is_running": True, "status": "running",
+            "progress": 0, "total": len(unscanned),
+            "phase": "", "error": "",
+        })
 
+    # Tidak ada nomor baru untuk dicek — jangan pura-pura "memeriksa".
     return templates.TemplateResponse(request, "_check_widget.html", {
-        "is_running": True, "status": "running",
-        "progress": 0, "total": len(unscanned) or 1,
-        "phase": "", "error": "",
+        "is_running": False,
+        "status": "done" if s.get("status") == "done" else "idle",
+        "progress": s.get("progress", 0),
+        "total": max(s.get("total", 1), 1),
+        "phase": s.get("phase", ""),
+        "error": s.get("error", ""),
+        "all_checked": True,
+        "notice": "Tidak ada nomor baru untuk dicek.",
     })
 
 @app.get("/check", response_class=HTMLResponse)
@@ -325,6 +337,7 @@ async def check_page(request: Request):
         "total": s.get("total", 1),
         "phase": s.get("phase", ""),
         "error": s.get("error", ""),
+        "all_checked": len(db.get_players_unused_numbers()) == 0,
     })
 
 @app.get("/check/status", response_class=HTMLResponse)
@@ -336,10 +349,10 @@ async def check_status(request: Request):
         unscanned = db.get_players_unused_numbers()
         all_checked = not unscanned
         # Kalau semua sudah dicek, tampilkan hasil nyata dari status file (progress=total),
-        # bukan "0 dari 1" yang menyesatkan.
+        # bukan "0 dari 1" yang menyesatkan. Jangan mengarang angka bila belum ada riwayat check.
         if all_checked:
             done_total = max(s.get("total", 1), 1)
-            done_progress = s.get("progress", done_total) or done_total
+            done_progress = s.get("progress", 0)
         else:
             done_total = len(unscanned) or 1
             done_progress = 0
