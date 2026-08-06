@@ -422,9 +422,9 @@ async def message_preview(request: Request, nomor_normalized: str, type: str = "
     fasil_name = os.getenv("FASIL_NAME", "Irfan Zharauri")
     fasil_kode = os.getenv("FASIL_CODE", "GCAF26-ID-9MJ-EP6")
     
-    if type == "remind-both":
+    if type in ("remind-both", "join-full", "join-redeem", "join-gear"):
         # Preview menunjukkan PESAN GABUNGAN yang benar-benar akan dikirim
-        tpl = TEMPLATES.get("remind-both")
+        tpl = TEMPLATES.get(type)
         if not tpl:
             return """<span class="text-xs" style="color: var(--danger);">Template tak dikenal</span>"""
         msg = personalize_message(tpl, player, fasil_name, fasil_kode)
@@ -537,7 +537,7 @@ async def save_template(request: Request, key: str):
     if not isinstance(new_content, str):
         new_content = ""
     
-    current = _load_templates() or dict(_DEFAULT_TEMPLATES)
+    current = {**_DEFAULT_TEMPLATES, **_load_templates()}
     current[key] = new_content
     
     # Persist

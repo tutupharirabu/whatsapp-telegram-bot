@@ -146,14 +146,17 @@ Contoh:
   python cli/send.py source/example.csv --mode formal
   python cli/send.py source/example.csv --mode kasual --wa-only
   python cli/send.py source/reminders.csv --mode remind-redeem --wa-only
-  python cli/send.py source/reminders.csv --mode remind-gear --wa-only
+  python cli/send.py source/reminders.csv --mode remind-both --wa-only
+  python cli/send.py source/peserta.csv --mode join-full --wa-only
+  python cli/send.py source/peserta.csv --mode join-redeem --wa-only
+  python cli/send.py source/peserta.csv --mode join-gear --wa-only
   python cli/send.py source/example.csv -m "Halo {nama}!" --wa-only
   python cli/send.py source/example.csv --mode formal --delay 3 --dry-run
         """,
     )
     parser.add_argument("csv", help="Path ke file CSV (kolom: nama, nomor_hp)")
     parser.add_argument("-m", "--message", help="Isi pesan custom (gunakan {nama}, {nama_fasil}, {kode_fasil} untuk placeholder)")
-    parser.add_argument("--mode", choices=["formal", "kasual", "remind-redeem", "remind-gear", "remind-both"], help="Gunakan template bawaan")
+    parser.add_argument("--mode", choices=["formal", "kasual", "remind-redeem", "remind-gear", "remind-both", "join-redeem", "join-gear", "join-full"], help="Gunakan template bawaan")
     parser.add_argument("--fasil-name", default="", help="Nama fasilitator")
     parser.add_argument("--fasil-kode", default="", help="Kode fasilitator")
     parser.add_argument("--wa-only", action="store_true", help="Hanya kirim WhatsApp")
@@ -168,7 +171,7 @@ Contoh:
     args = parser.parse_args()
 
     if not args.message and not args.mode:
-        parser.error("Harus pakai --message (-m) atau --mode (formal/kasual)")
+        parser.error("Harus pakai --message (-m) atau --mode (formal/kasual/remind-*/join-full)")
 
     # Pastikan skema DB ada (tabel send_logs dll) sebelum dipakai dedup & logging
     from bot import db as _db

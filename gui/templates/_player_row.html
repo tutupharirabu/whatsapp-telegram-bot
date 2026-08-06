@@ -5,6 +5,13 @@
 {% elif needs_gear %}{% set rtype = 'remind-gear' %}{% endif %}
 {# ID aman untuk CSS selector (key email: berisi karakter khusus) #}
 {% set nid = p.nomor_normalized | replace(':', '_') | replace('@', '_') %}
+{# Belum join grup + masih ada PR redeem/GEAR → satu chat panjang gabungan.
+   Template dipilih sesuai kombinasi kondisi: join-redeem / join-gear / join-full. #}
+{% set needs_full = (not p.tg_joined) and rtype %}
+{% if needs_full and needs_redeem and needs_gear %}{% set jtype = 'join-full' %}
+{% elif needs_full and needs_redeem %}{% set jtype = 'join-redeem' %}
+{% elif needs_full and needs_gear %}{% set jtype = 'join-gear' %}{% endif %}
+{% set join_default = jtype if needs_full else 'kasual' %}
 <tr id="row-{{ nid }}">
     <td class="font-medium max-w-[180px] truncate">{{ p.nama }}</td>
     <td class="max-w-[200px] truncate text-dim" title="{{ p.email or '' }}">{{ p.email or "—" }}</td>
@@ -66,27 +73,34 @@
             <span class="tag tag-accent">Kontak via email</span>
             {% endif %}
             {% if not p.tg_joined %}
-            <div class="action-row">
-                <label class="sr-only" for="tone-{{ nid }}">Tone pesan join grup</label>
-                <select id="tone-{{ nid }}" name="type" class="select"
-                    aria-label="Pilih tone pesan join grup"
+            <div class="flex flex-col gap-2">
+                <label class="sr-only" for="tone-{{ nid }}">Pilih pesan untuk {{ p.nama }}</label>
+                <select id="tone-{{ nid }}" name="type" class="select w-full"
+                    aria-label="Pilih pesan untuk {{ p.nama }}"
                     hx-get="/api/message-preview/{{ p.nomor_normalized }}"
                     hx-target="#action-join-{{ nid }}"
                     hx-swap="innerHTML"
                     hx-trigger="change">
-                    <option value="kasual">Kasual</option>
+                    {% if needs_full %}
+                    <option value="{{ jtype }}" selected>
+                        {% if jtype == 'join-full' %}Panduan Lengkap (Join + Token + GEAR)
+                        {% elif jtype == 'join-redeem' %}Panduan Lengkap (Join + Token)
+                        {% else %}Panduan Lengkap (Join + GEAR){% endif %}
+                    </option>
+                    {% endif %}
+                    <option value="kasual" {% if not needs_full %}selected{% endif %}>Kasual</option>
                     <option value="formal">Formal</option>
                 </select>
                 <span id="action-join-{{ nid }}"
-                    class="flex-1 min-w-0"
-                    hx-get="/api/message-preview/{{ p.nomor_normalized }}?type=kasual"
+                    class="w-full min-w-0"
+                    hx-get="/api/message-preview/{{ p.nomor_normalized }}?type={{ join_default }}"
                     hx-trigger="load" hx-swap="innerHTML"></span>
             </div>
             {% endif %}
-            {% if rtype %}
+            {% if rtype and not needs_full %}
             <div class="action-row">
                 <span class="tag tag-danger">
-                    {% if rtype == 'remind-both' %}Redeem + GEAR{% elif rtype == 'remind-redeem' %}Redeem{% else %}GEAR{% endif %}
+                    {% if rtype == 'remind-both' %}Token + GEAR{% elif rtype == 'remind-redeem' %}Token{% else %}GEAR{% endif %}
                 </span>
                 <span id="action-remind-{{ nid }}"
                     class="flex-1 min-w-0"

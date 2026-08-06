@@ -74,9 +74,54 @@ _DEFAULT_TEMPLATES = {
         "📧 arcade@dicoding.com, ya.\n\n"
         "Semangat! 🚀"
     ),
+    "join-full": (
+        "Halo, {nama}! 👋\n\n"
+        "Perkenalkan, saya Irfan Zharauri, fasilitator kamu di "
+        "Program Google Skills Arcade Fasilitator 2026 dengan kode fasil GCAF26-ID-9MJ-EP6. 😊\n\n"
+        "Biar komunikasi dan koordinasi kita lancar, ada 3 hal yang perlu kamu selesaikan:\n\n"
+        "1️⃣ Join grup Telegram koordinasi kita di:\n"
+        "👉 https://t.me/+wXiMsFTC-jsyODhl\n\n"
+        "2️⃣ Redeem kode akses kamu.\n"
+        "⚠️ Kalau belum redeem sampai 7 Agustus 2026, "
+        "token kredit kamu akan di-assign ke registrant lain lho!\n\n"
+        "3️⃣ Dapetin Lencana Digital GEAR (Gemini Enterprise Agent Ready) di:\n"
+        "👉 dicoding.id/Arcade26-GearBadge\n\n"
+        "Kalau ada kendala di salah satu langkah di atas, langsung kabari aku atau email ke:\n"
+        "📧 arcade@dicoding.com, ya.\n\n"
+        "Semangat, sampai jumpa di grup! 🚀"
+    ),
+    "join-redeem": (
+        "Halo, {nama}! 👋\n\n"
+        "Perkenalkan, saya Irfan Zharauri, fasilitator kamu di "
+        "Program Google Skills Arcade Fasilitator 2026 dengan kode fasil GCAF26-ID-9MJ-EP6. 😊\n\n"
+        "Biar komunikasi dan koordinasi kita lancar, ada 2 hal yang perlu kamu selesaikan:\n\n"
+        "1️⃣ Join grup Telegram koordinasi kita di:\n"
+        "👉 https://t.me/+wXiMsFTC-jsyODhl\n\n"
+        "2️⃣ Redeem kode akses kamu.\n"
+        "⚠️ Kalau belum redeem sampai 7 Agustus 2026, "
+        "token kredit kamu akan di-assign ke registrant lain lho!\n\n"
+        "Kalau ada kendala di salah satu langkah di atas, langsung kabari aku atau email ke:\n"
+        "📧 arcade@dicoding.com, ya.\n\n"
+        "Semangat, sampai jumpa di grup! 🚀"
+    ),
+    "join-gear": (
+        "Halo, {nama}! 👋\n\n"
+        "Perkenalkan, saya Irfan Zharauri, fasilitator kamu di "
+        "Program Google Skills Arcade Fasilitator 2026 dengan kode fasil GCAF26-ID-9MJ-EP6. 😊\n\n"
+        "Biar komunikasi dan koordinasi kita lancar, ada 2 hal yang perlu kamu selesaikan:\n\n"
+        "1️⃣ Join grup Telegram koordinasi kita di:\n"
+        "👉 https://t.me/+wXiMsFTC-jsyODhl\n\n"
+        "2️⃣ Dapetin Lencana Digital GEAR (Gemini Enterprise Agent Ready) di:\n"
+        "👉 dicoding.id/Arcade26-GearBadge\n\n"
+        "Kalau ada kendala di salah satu langkah di atas, langsung kabari aku atau email ke:\n"
+        "📧 arcade@dicoding.com, ya.\n\n"
+        "Semangat, sampai jumpa di grup! 🚀"
+    ),
 }
 
-TEMPLATES = _load_templates() or _DEFAULT_TEMPLATES
+# Merge default + kustomisasi tersimpan: semua key default (mis. join-full) SELALU ada
+# walau templates.json lama belum punya key tersebut; isi kustomisasi tetap menang.
+TEMPLATES = {**_DEFAULT_TEMPLATES, **_load_templates()}
 
 
 def personalize_message(template: str, player: dict, fasil_name: str = "", fasil_kode: str = "") -> str:
