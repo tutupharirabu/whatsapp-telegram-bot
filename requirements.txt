@@ -7,5 +7,5 @@ python-telegram-bot==21.4
 python-dotenv>=1.2.2
 telethon>=1.44.0
 phonenumbers>=9.0.36
-selenium>=4.15
+selenium>=4.46.0
 webdriver-manager>=4.0
