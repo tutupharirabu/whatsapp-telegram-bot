@@ -5,7 +5,7 @@ python-multipart>=0.0.9
 
 python-telegram-bot==21.4
 python-dotenv>=1.2.2
-telethon>=1.36
+telethon>=1.44.0
 phonenumbers>=8.13
 selenium>=4.15
 webdriver-manager>=4.0
