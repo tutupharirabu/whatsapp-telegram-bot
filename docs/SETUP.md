@@ -27,7 +27,7 @@ Install dependensi:
 pip install -r requirements.txt
 ```
 
-Isi `requirements.txt` (root): `fastapi>=0.115`, `uvicorn[standard]>=0.30`, `jinja2>=3.1`, `python-multipart>=0.0.9`, `python-telegram-bot==21.4`, `python-dotenv==1.0.1`, `telethon>=1.36`, `phonenumbers>=8.13`, `selenium>=4.15`, `webdriver-manager>=4.0`.
+Isi `requirements.txt` (root): `fastapi>=0.115`, `uvicorn[standard]>=0.30`, `jinja2>=3.1`, `python-multipart>=0.0.9`, `python-telegram-bot==21.4`, `python-dotenv>=1.2.2`, `telethon>=1.36`, `phonenumbers>=8.13`, `selenium>=4.15`, `webdriver-manager>=4.0`.
 
 ## 2. Konfigurasi Environment (.env)
 
