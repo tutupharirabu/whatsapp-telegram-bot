@@ -70,7 +70,7 @@ Contoh:
 
             results["whatsapp"] = result
             if result["status"] == "success":
-                print(f"  WA: Terkirim ke {result['phone']}")
+                print("  WA: Terkirim")
             else:
                 print(f"  WA: Gagal - {result.get('error', 'Unknown')}")
         except (ValueError, OSError, RuntimeError):
