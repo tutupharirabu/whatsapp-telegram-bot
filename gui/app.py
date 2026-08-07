@@ -477,8 +477,8 @@ async def send_wa(request: Request, nomor_normalized: str, type: str = "kasual")
                 headers={"HX-Trigger": "update-dashboard"}
             )
         return HTMLResponse(content=f"""<span style="color: var(--danger);">Gagal: {html.escape(str(result.get("error", "unknown")))}</span>""")
-    except (ValueError, OSError, RuntimeError) as e:
-        return HTMLResponse(content=f"""<span style="color: var(--danger);">Gagal: {html.escape(str(e))}</span>""")
+    except (ValueError, OSError, RuntimeError):
+        return HTMLResponse(content="""<span style="color: var(--danger);">Gagal mengirim via WA — coba lagi nanti</span>""")
 
 @app.post("/api/send-tg/{nomor_normalized}", response_class=HTMLResponse)
 async def send_tg(request: Request, nomor_normalized: str, type: str = "kasual"):
@@ -518,8 +518,8 @@ async def send_tg(request: Request, nomor_normalized: str, type: str = "kasual")
                 headers={"HX-Trigger": "update-dashboard"}
             )
         return HTMLResponse(content="""<span style="color: var(--danger);">Gagal</span>""")
-    except (ValueError, OSError, RuntimeError) as e:
-        return HTMLResponse(content=f"""<span style="color: var(--danger);">Gagal: {html.escape(str(e))}</span>""")
+    except (ValueError, OSError, RuntimeError):
+        return HTMLResponse(content="""<span style="color: var(--danger);">Gagal mengirim via TG — coba lagi nanti</span>""")
 
 @app.get("/templates", response_class=HTMLResponse)
 async def templates_page(request: Request):

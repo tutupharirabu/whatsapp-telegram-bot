@@ -273,7 +273,7 @@ def send_whatsapp_message(phone_number: str, message: str, wait_time: int = 15) 
                     "phone": clean_number,
                     "message_preview": message[:50] + ("..." if len(message) > 50 else ""),
                 }
-            print(f"  WA: {clean_number} terdeteksi gagal terkirim, retry...")
+            print(f"  WA: {clean_number[-4:]} terdeteksi gagal terkirim, retry...")
 
         return {"status": "error", "phone": clean_number, "error": "WA_MESSAGE_NOT_SENT"}
     except (WebDriverException, ValueError, OSError) as e:
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     result = send_whatsapp_message(phone, message)
     close_wa_driver()
     if result["status"] == "success":
-        print(f"Pesan WhatsApp terkirim ke {result['phone']}!")
+        print(f"Pesan WhatsApp terkirim ke ...{result['phone'][-4:]}!")
     else:
         print(f"Gagal: {result.get('error')}")
         sys.exit(1)

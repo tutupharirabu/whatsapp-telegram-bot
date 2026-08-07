@@ -73,9 +73,9 @@ Contoh:
                 print(f"  WA: Terkirim ke {result['phone']}")
             else:
                 print(f"  WA: Gagal - {result.get('error', 'Unknown')}")
-        except (ValueError, OSError, RuntimeError) as e:
-            print(f"  WA Exception: {e}")
-            results["whatsapp"] = {"status": "error", "error": str(e)}
+        except (ValueError, OSError, RuntimeError):
+            print("  WA Exception: terjadi kesalahan saat mengirim (detail disembunyikan)")
+            results["whatsapp"] = {"status": "error", "error": "WA send exception"}
 
     if args.tg:
         print(f"\nMengirim Telegram ke {args.tg}...")
@@ -85,9 +85,9 @@ Contoh:
             print("  TG: Terkirim!")
             print(f"  Chat ID: {result['chat_id']}")
             print(f"  Message ID: {result['message_id']}")
-        except (ValueError, OSError, RuntimeError) as e:
-            print(f"  TG Exception: {e}")
-            results["telegram"] = {"status": "error", "error": str(e)}
+        except (ValueError, OSError, RuntimeError):
+            print("  TG Exception: terjadi kesalahan saat mengirim (detail disembunyikan)")
+            results["telegram"] = {"status": "error", "error": "TG send exception"}
 
     print("\n" + "=" * 50)
     print("RINGKASAN:")
