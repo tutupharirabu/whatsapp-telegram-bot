@@ -1,0 +1,20 @@
+# Dependabot configuration for whatsapp-telegram-bot
+# See: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+version: 2
+
+updates:
+  # Python dependencies (root requirements.txt)
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 5
+    groups:
+      python-minor:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"

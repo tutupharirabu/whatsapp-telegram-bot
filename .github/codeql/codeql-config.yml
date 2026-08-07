@@ -1,0 +1,15 @@
+# CodeQL configuration file (advanced / default config)
+#
+# Referenced from .github/workflows/codeql.yml via `config-file`.
+# Customize analysis here — add/remove `paths-ignore` entries, or later add
+# query filters (`query-filters`) and custom query packs — without having to
+# edit the workflow itself.
+name: "GCAF CodeQL config"
+
+paths-ignore:
+  - runtime/                # runtime state: sqlite db, logs, chrome profiles, sessions
+  - .venv/                  # local virtualenv
+  - __pycache__/            # Python bytecode cache
+  - .playwright-mcp/        # local Playwright MCP working files
+  - .uiwork/                # local UI work/scratch files
+  - source/                 # data files only (e.g. CSV), not application source
